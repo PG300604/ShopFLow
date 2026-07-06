@@ -6,6 +6,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+import com.shopflow.order.model.OrderStatus;
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public interface OrderRepository extends JpaRepository<Order, UUID> {
+    List<Order> findByStatusAndExpiresAtBefore(OrderStatus status, LocalDateTime time);
 }

@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.shopflow.common.client.notification.NotificationClient;
@@ -53,6 +54,7 @@ public class OrderService {
         order.setShippingAddress(request.getShippingAddress());
         order.setStatus(OrderStatus.PENDING_PAYMENT);
         order.setTotalAmount(BigDecimal.ZERO);
+        order.setExpiresAt(LocalDateTime.now().plusMinutes(15));
 
         // Save order to generate UUID
         order = orderRepository.save(order);
@@ -83,6 +85,7 @@ public class OrderService {
                 orderItem.setProductId(item.getProductId());
                 orderItem.setQuantity(item.getQuantity());
                 orderItem.setUnitPrice(mockPrice);
+                orderItem.setReservationId(reservation.getReservationId());
                 order.addItem(orderItem);
 
                 totalAmount = totalAmount.add(mockPrice.multiply(BigDecimal.valueOf(item.getQuantity())));
@@ -143,7 +146,34 @@ public class OrderService {
         }
 
         order.setStatus(newStatus);
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+
+        // Inventory commit / release orchestration
+        if (newStatus == OrderStatus.PAID) {
+            for (OrderItem item : savedOrder.getItems()) {
+                if (item.getReservationId() != null) {
+                    try {
+                        inventoryClient.commit(item.getReservationId());
+                        log.info("Committed inventory reservation {} for product {}", item.getReservationId(), item.getProductId());
+                    } catch (Exception ex) {
+                        log.error("Failed to commit reservation {}: {}", item.getReservationId(), ex.getMessage());
+                    }
+                }
+            }
+        } else if (newStatus == OrderStatus.FAILED || newStatus == OrderStatus.CANCELLED) {
+            for (OrderItem item : savedOrder.getItems()) {
+                if (item.getReservationId() != null) {
+                    try {
+                        inventoryClient.release(item.getReservationId());
+                        log.info("Released inventory reservation {} for product {}", item.getReservationId(), item.getProductId());
+                    } catch (Exception ex) {
+                        log.error("Failed to release reservation {}: {}", item.getReservationId(), ex.getMessage());
+                    }
+                }
+            }
+        }
+
+        return savedOrder;
     }
 
     private boolean isValidTransition(OrderStatus current, OrderStatus target) {

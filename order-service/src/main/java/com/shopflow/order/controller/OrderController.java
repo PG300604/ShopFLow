@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -17,6 +18,9 @@ import java.util.UUID;
 public class OrderController {
 
     private final OrderService orderService;
+
+    @Value("${shopflow.internal-key}")
+    private String internalKeySecret;
 
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
@@ -37,8 +41,12 @@ public class OrderController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<Order> updateStatus(
             @PathVariable("id") UUID id,
+            @RequestHeader(value = "X-Internal-Key", required = false) String internalKey,
             @Valid @RequestBody StatusUpdateRequest request
     ) {
+        if (internalKey == null || !internalKey.equals(internalKeySecret)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         Order updatedOrder = orderService.updateOrderStatus(id, request.getStatus());
         return ResponseEntity.ok(updatedOrder);
     }

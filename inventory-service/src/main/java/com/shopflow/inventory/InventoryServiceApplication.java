@@ -1,4 +1,4 @@
-package com.shopflow.order;
+package com.shopflow.inventory;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,9 +8,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SpringBootApplication(scanBasePackages = "com.shopflow")
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = "com.shopflow")
-@org.springframework.scheduling.annotation.EnableScheduling
-public class OrderServiceApplication {
+public class InventoryServiceApplication {
     public static void main(String[] args) {
-        SpringApplication.run(OrderServiceApplication.class, args);
+        SpringApplication.run(InventoryServiceApplication.class, args);
     }
 }
