@@ -435,6 +435,47 @@
       ]
     },
     {
+      "name": "9.1 Attempt Checkout (No Auth Token) -> Expect 401",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{customer_user_id}}\",\n  \"shippingAddress\": \"123 Main St, Seattle, WA 98101\",\n  \"items\": [\n    {\n      \"productId\": \"{{created_product_id}}\",\n      \"quantity\": 1\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/orders/checkout",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "orders",
+            "checkout"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Access denied - Status code is 401\", function () {",
+              "    pm.response.to.have.status(401);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
       "name": "10. Customer: Get Order by ID",
       "request": {
         "method": "GET",
@@ -468,6 +509,37 @@
               "var jsonData = pm.response.json();",
               "pm.test(\"Order status is PENDING_PAYMENT\", function () {",
               "    pm.expect(jsonData.status).to.eql(\"PENDING_PAYMENT\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "10.1 Attempt Get Order by ID (No Auth Token) -> Expect 401",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/orders/{{created_order_id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "orders",
+            "{{created_order_id}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Access denied - Status code is 401\", function () {",
+              "    pm.response.to.have.status(401);",
               "});"
             ],
             "type": "text/javascript"

@@ -44,7 +44,7 @@ truth, not the plan — if something's built but untested, say so.
 | api-gateway | ✅ Built, tested | Routes for all services confirmed working through gateway |
 | auth-service | ✅ Built, tested | Register/login/JWT confirmed end-to-end against Supabase Postgres |
 | product-service | ✅ Built, tested | Verified public reads, admin-protected writes, role-checks, and gateway routing |
-| order-service | ✅ Built, tested (mock inventory) | Checkout, state machine validation, status updates, and notification triggers fully tested |
+| order-service | ✅ Built, secured, tested | Checkout, state machine validation, status updates, JWT security, and notification triggers fully tested |
 | payment-service | ✅ Built, tested | PaymentIntent creation, webhook verification, and status propagation tested |
 | notification-service | ✅ Built, tested | Asynchronous SMTP confirmation and payment updates verified |
 | inventory-service | 🔲 External — Riya's scope | Task doc sent to her: `Riya-Inventory-Service-Task.md`. Not yet integrated (Phase 3) |
