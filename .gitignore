@@ -1,0 +1,44 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.nextVal
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper-bundle.jar
+
+# Log files
+*.log
+logs/
+
+# IDEs and Editors
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.metadata/
+bin/
+tmp/
+.vscode/
+
+# Local configuration / secrets
+application-local.yml
+*.properties.local
+*.yml.local
+
+# OS Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Workspace / Agent specific files
+.agents/
+.claude/
+graphify-out/
+C:/Users/priya/.gemini/antigravity/
+.maven/
