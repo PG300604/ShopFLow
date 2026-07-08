@@ -1,83 +1,66 @@
-# ShopFlow Design System & Style Guide
+# ShopFlow Design System & Style Guide (Pinterest Editorial Edition)
 
-This document defines the unified design language, color tokens, typography, component specs, and iconography for the ShopFlow frontend. It serves as the single source of truth for UI/UX consistency across all views (catalog, cart, checkout, order history, and admin panels).
+This guide defines the premium, high-contrast, editorial layout design system for the ShopFlow frontend, aligning with modern visual feeds (high-fashion grids, minimal tech layouts, and smooth-scroll interactive animations).
 
 ---
 
-## 🎨 1. Theme & Color Tokens (Neon Obsidian)
-ShopFlow uses a premium, modern dark-mode aesthetic featuring **glassmorphism**, subtle glowing borders, and vibrant gradient highlights to provide a high-end, developer-oriented resume project look.
+## 🎨 1. Palette & Theme System
 
-| Token | HSL / RGBA | Hex Equivalent | Purpose |
+The theme supports a high-contrast transition between light/dark modes and automatically adapts to system settings.
+
+| Token | Light Mode (High-Contrast White) | Dark Mode (Void Black) | Design Purpose |
 |---|---|---|---|
-| **Background** | `hsl(222, 47%, 11%)` | `#0F172A` | Base app background (Deep Obsidian) |
-| **Card / Surface** | `rgba(30, 41, 59, 0.7)` | `#1E293B` (70%) | Container surfaces with `backdrop-filter: blur(12px)` |
-| **Border / Stroke** | `rgba(255, 255, 255, 0.08)` | — | Subtle borders separating cards and sections |
-| **Accent Primary** | `hsl(262, 83%, 58%)` | `#6D28D9` | Neon Violet (Main brand color, active states) |
-| **Accent Secondary** | `hsl(189, 94%, 43%)` | `#06B6D4` | Cyber Cyan (Highlights, success states, success alerts) |
-| **Text Main** | `hsl(210, 40%, 98%)` | `#F8FAFC` | Headings and primary labels |
-| **Text Muted** | `hsl(215, 16%, 65%)` | `#94A3B8` | Body text, descriptions, and secondary labels |
-| **Text Alert** | `hsl(0, 84%, 60%)` | `#EF4444` | Errors, low-stock warnings, cancellations |
+| **Primary Background** | `#FFFFFF` | `#050505` (Void Black) | Main viewport canvas |
+| **Secondary Surface** | `#F5F5F7` (Off-white) | `#121212` (Slate Black) | Card panels and floating headers |
+| **Glow / Highlight** | `#10B981` (Cyber Lime/Green) | `#10B981` | Accent color for badges and success states |
+| **Active Focus** | `#000000` | `#FFFFFF` | Buttons, headers, primary text labels |
+| **Text Main** | `#000000` | `#FFFFFF` | Direct visual readability |
+| **Text Muted** | `#6B7280` (Muted Gray) | `#9CA3AF` | Subtitles, product descriptions, timestamps |
+| **Borders** | `rgba(0, 0, 0, 0.08)` | `rgba(255, 255, 255, 0.08)` | Minimal separating borders |
 
 ---
 
-## ✍️ 2. Typography & Hierarchy
-We use **Outfit** (for geometric headings) and **Inter** (for high-legibility body copy). Both fonts are imported from Google Fonts.
+## ✍️ 2. Editorial Typography
+To emulate modern magazine/Pinterest grids, we pair a high-contrast serif header font with a technical, high-legibility sans-serif body font.
 
-* **Main Heading (H1)**: `32px / 2rem` | Font-Weight: `700 (Bold)` | Letter-Spacing: `-0.025em`
-* **Sub-Heading (H2)**: `24px / 1.5rem` | Font-Weight: `600 (Semi-Bold)`
-* **Card Title (H3)**: `18px / 1.125rem` | Font-Weight: `600 (Semi-Bold)`
-* **Body text**: `14px / 0.875rem` | Font-Weight: `400 (Regular)` | Line-Height: `1.5`
-* **Labels / Small**: `12px / 0.75rem` | Font-Weight: `500 (Medium)`
+* **Primary Heading Font**: **Syne** (Google Fonts) — a wide, geometric display font for a striking, modern look, or **Playfair Display** for a luxury feel.
+* **Secondary Body Font**: **Inter** (Google Fonts) — for ultimate crispness in descriptions, pricing, and specs.
+
+### Hierarchy
+* **Main Banner (Display H1)**: `48px / 3rem` | Font-Weight: `800 (Extra Bold)` | Letter-Spacing: `-0.03em`
+* **Section Title (H2)**: `24px / 1.5rem` | Font-Weight: `700 (Bold)`
+* **Product Title (H3)**: `16px / 1rem` | Font-Weight: `600 (Semi-Bold)`
+* **Muted Body**: `14px / 0.875rem` | Line-Height: `1.6`
 
 ---
 
-## ⚡ 3. Micro-Animations & Interactivity
-To make the interface feel responsive and premium:
-* **Hover Scale**: Hovering on product cards scales the element slightly (`transform: scale(1.02); transition: all 0.3s ease;`).
-* **Active Glow**: Primary buttons and active input fields display a soft violet glow shadow on focus/hover:
+## 🌀 3. Layout, Scroll Animations & Sliding Windows
+
+### A. The Sliding Ad Window (Banner Slider)
+* **Visuals**: A full-width horizontal banner displaying high-end promotional graphics or product close-ups.
+* **Animations**:
+  * **Image transition**: Auto-crossfading with a zoom effect (`scale(1) -> scale(1.05)` over 5 seconds).
+  * **Text overlay**: Fade-in and slide-up text elements (`translateY(20px) -> translateY(0)`) whenever the slide changes.
+
+### B. Scroll-Triggered Reveal Animations
+* **Grid Entry**: Product items fade in and slide up as they enter the viewport using scroll-triggered thresholds.
+* **Parallax Cards**: Subtle parallax shifts on scroll backgrounds to create visual depth as the user navigates the catalog.
+
+### C. Glassmorphism & Borders
+* Cards use sharp `4px` corner radii (very thin, crisp borders) rather than round bubbly corners, matching premium editorial layouts.
+* Navigation bars use high-blur backdrops:
   ```css
-  box-shadow: 0 0 15px rgba(109, 40, 217, 0.4);
-  ```
-* **Page Transitions**: Smooth fade-in animations for all containers:
-  ```css
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  backdrop-filter: blur(20px) saturate(180%);
+  background-color: rgba(255, 255, 255, 0.8); /* Light */
+  background-color: rgba(5, 5, 5, 0.8);        /* Dark */
   ```
 
 ---
 
-## 📦 4. UI Components Specifications
-
-### A. Navigation Bar (Floating Glass Header)
-* **Layout**: Fixed top, width `100%`, flexbox layout with space-between.
-* **Style**: Backdropped card surface, border-bottom `1px solid rgba(255, 255, 255, 0.08)`.
-* **Left**: Futuristic geometric logo text `ShopFlow` (Gradient fill: Cyan to Violet).
-* **Right**: Icons for search, cart (with a glowing red count badge), and profile.
-
-### B. Product Cards
-* **Border**: Soft border glow on hover.
-* **Image**: Fixed aspect ratio (`aspect-ratio: 4/3`), object-fit cover.
-* **Footer**: Title, HSL-colored category tag, price in cyan (`#06B6D4`), and a violet cart button.
-
-### C. Buttons
-* **Primary (Glow-Gradient)**: Linear gradient from Violet (`#6D28D9`) to Cyan (`#06B6D4`). Text is white, border-radius `8px`.
-* **Secondary (Ghost)**: Transparent background, white border `1px solid rgba(255,255,255,0.2)`. Violet text on hover.
-
-### D. Shopping Cart Drawer
-* **Style**: Slides in from the right edge.
-* **Content**: List of added items, price calculator, and a checkout button.
-* **Micro-interaction**: Smooth overlay backdrop fade.
-
----
-
-## 🎯 5. Iconography
-We use **Lucide Icons** (clean, thin outline geometric strokes, matching the design aesthetic):
-* 🛒 `shopping-cart` — Add to Cart, Cart Drawer
-* 👤 `user` — Profile info, Login status
-* 📦 `package` — Product management, Orders history
-* 🌟 `star` — Review ratings (Solid yellow for active star, outline for empty)
-* ⚠️ `alert-triangle` — Low stock reorder warning, cancelled orders
-* 💳 `credit-card` — Stripe checkout trigger
-* 🔑 `key` — Internal security indicator
+## 🎯 4. Iconography
+We use **Lucide Icons** in a thin geometric weight (`stroke-width: 1.5`):
+* Shopping cart: `shopping-cart` (outline)
+* Star ratings: `star` (yellow fill when active, otherwise thin outline)
+* Profile: `user` (outline)
+* Close Drawer: `x` (outline)
+* Theme indicator: `sun` (light mode), `moon` (dark mode), `monitor` (system theme)
