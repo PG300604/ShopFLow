@@ -51,6 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String email = claims.getSubject();
             String role = claims.get("role", String.class);
+            String userId = claims.get("userId", String.class);
 
             if (email != null && role != null) {
                 // Map the role claim to a ROLE_ authority for Spring Security
@@ -58,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 List<SimpleGrantedAuthority> authorities = Collections.singletonList(authority);
 
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(email, null, authorities);
+                        new UsernamePasswordAuthenticationToken(userId != null ? userId : email, null, authorities);
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

@@ -13,4 +13,6 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, UUID> {
     List<Order> findByStatusAndExpiresAtBefore(OrderStatus status, LocalDateTime time);
+    List<Order> findByUserIdOrderByCreatedAtDesc(UUID userId);
+    org.springframework.data.domain.Page<Order> findByStatus(OrderStatus status, org.springframework.data.domain.Pageable pageable);
 }

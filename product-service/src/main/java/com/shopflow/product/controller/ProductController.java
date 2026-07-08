@@ -1,6 +1,8 @@
 package com.shopflow.product.controller;
 
 import com.shopflow.product.model.Product;
+import com.shopflow.product.model.Review;
+import com.shopflow.product.repository.ReviewRepository;
 import com.shopflow.product.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -10,7 +12,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -18,9 +23,11 @@ import java.util.UUID;
 public class ProductController {
 
     private final ProductService productService;
+    private final ReviewRepository reviewRepository;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, ReviewRepository reviewRepository) {
         this.productService = productService;
+        this.reviewRepository = reviewRepository;
     }
 
     @GetMapping
@@ -63,5 +70,56 @@ public class ProductController {
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") UUID id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{productId}/reviews")
+    public ResponseEntity<Review> submitReview(
+            @PathVariable("productId") UUID productId,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestBody Map<String, Object> body
+    ) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // Verify product exists
+        productService.getProductById(productId);
+
+        String principal = (String) org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UUID userId = UUID.fromString(principal);
+
+        int rating = ((Number) body.get("rating")).intValue();
+        if (rating < 1 || rating > 5) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rating must be between 1 and 5");
+        }
+        String comment = (String) body.get("comment");
+
+        Review review = new Review(productId, userId, rating, comment);
+        Review savedReview = reviewRepository.save(review);
+        return new ResponseEntity<>(savedReview, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{productId}/reviews")
+    public ResponseEntity<Page<Review>> getReviews(
+            @PathVariable("productId") UUID productId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Review> reviews = reviewRepository.findByProductIdOrderByCreatedAtDesc(productId, pageable);
+        return ResponseEntity.ok(reviews);
+    }
+
+    @GetMapping("/{productId}/rating")
+    public ResponseEntity<Map<String, Object>> getProductRating(@PathVariable("productId") UUID productId) {
+        Double avgRating = reviewRepository.getAverageRatingForProduct(productId);
+        Long count = reviewRepository.countByProductId(productId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("productId", productId);
+        response.put("averageRating", avgRating != null ? avgRating : 0.0);
+        response.put("count", count);
+
+        return ResponseEntity.ok(response);
     }
 }

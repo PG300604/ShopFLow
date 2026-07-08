@@ -35,6 +35,9 @@ public class User {
     @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
 
+    @Column(name = "default_shipping_address", length = 500)
+    private String defaultShippingAddress;
+
     public User() {
     }
 
@@ -99,5 +102,13 @@ public class User {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getDefaultShippingAddress() {
+        return defaultShippingAddress;
+    }
+
+    public void setDefaultShippingAddress(String defaultShippingAddress) {
+        this.defaultShippingAddress = defaultShippingAddress;
     }
 }

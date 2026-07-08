@@ -9,7 +9,9 @@ import com.shopflow.order.dto.CheckoutRequest;
 import com.shopflow.order.model.Order;
 import com.shopflow.order.model.OrderItem;
 import com.shopflow.order.model.OrderStatus;
+import com.shopflow.order.model.CartItem;
 import com.shopflow.order.repository.OrderRepository;
+import com.shopflow.order.repository.CartItemRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -34,11 +36,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final InventoryClient inventoryClient;
     private final NotificationClient notificationClient;
+    private final CartItemRepository cartItemRepository;
 
-    public OrderService(OrderRepository orderRepository, InventoryClient inventoryClient, NotificationClient notificationClient) {
+    public OrderService(OrderRepository orderRepository, InventoryClient inventoryClient, NotificationClient notificationClient, CartItemRepository cartItemRepository) {
         this.orderRepository = orderRepository;
         this.inventoryClient = inventoryClient;
         this.notificationClient = notificationClient;
+        this.cartItemRepository = cartItemRepository;
     }
 
     public Order getOrderById(UUID id) {
@@ -193,5 +197,42 @@ public class OrderService {
             default:
                 return false; // Terminal states (FAILED, CANCELLED, SHIPPED) cannot transition
         }
+    }
+
+    public List<Order> getUserOrderHistory(UUID userId) {
+        return orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
+    }
+
+    public org.springframework.data.domain.Page<Order> getAllOrdersForAdmin(OrderStatus status, org.springframework.data.domain.Pageable pageable) {
+        if (status != null) {
+            return orderRepository.findByStatus(status, pageable);
+        }
+        return orderRepository.findAll(pageable);
+    }
+
+    public List<CartItem> getCart(UUID userId) {
+        return cartItemRepository.findByUserId(userId);
+    }
+
+    @Transactional
+    public CartItem addToCart(UUID userId, UUID productId, int quantity) {
+        if (quantity <= 0) {
+            cartItemRepository.deleteById(new com.shopflow.order.model.CartItemId(userId, productId));
+            return null;
+        }
+        CartItem item = cartItemRepository.findById(new com.shopflow.order.model.CartItemId(userId, productId))
+                .orElse(new CartItem(userId, productId, 0));
+        item.setQuantity(quantity);
+        return cartItemRepository.save(item);
+    }
+
+    @Transactional
+    public void removeFromCart(UUID userId, UUID productId) {
+        cartItemRepository.deleteById(new com.shopflow.order.model.CartItemId(userId, productId));
+    }
+
+    @Transactional
+    public void clearCart(UUID userId) {
+        cartItemRepository.deleteByUserId(userId);
     }
 }
