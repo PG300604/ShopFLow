@@ -39,7 +39,7 @@ for ($i = 1; $i -lt $services.Length; $i++) {
 
 # Start Frontend Dev Server
 Write-Host "Starting Frontend Development Server..." -ForegroundColor Yellow
-Start-Process npm -ArgumentList "run", "dev" -WorkingDirectory "d:\ShopFlow\frontend" -NoNewWindow
+Start-Process cmd -ArgumentList "/c", "npm run dev" -WorkingDirectory "d:\ShopFlow\frontend" -NoNewWindow
 
 Write-Host "=========================================" -ForegroundColor Green
 Write-Host "All services started! You can check logs in: $logDir" -ForegroundColor Green
