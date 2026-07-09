@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
 import './HeroBanner.css';
 
 interface Slide {
@@ -11,9 +12,20 @@ interface Slide {
   description: string;
   cta: string;
   bgClass: string;
+  imageUrl?: string;
+  productId?: string;
 }
 
-const slides: Slide[] = [
+interface Promotion {
+  id: string;
+  productId: string;
+  title: string;
+  tagLine: string;
+  description: string;
+  imageUrl: string;
+}
+
+const defaultSlides: Slide[] = [
   {
     id: 1,
     tag: 'New Season',
@@ -77,6 +89,7 @@ const textVariants = {
 };
 
 export const HeroBanner = () => {
+  const [slides, setSlides] = useState<Slide[]>(defaultSlides);
   const [[currentIndex, direction], setSlide] = useState([0, 0]);
   const navigate = useNavigate();
 
@@ -87,13 +100,42 @@ export const HeroBanner = () => {
         return [next, newDirection];
       });
     },
-    []
+    [slides.length]
   );
 
   const goToSlide = (index: number) => {
     const dir = index > currentIndex ? 1 : -1;
     setSlide([index, dir]);
   };
+
+  // Fetch active promotions from backend on mount
+  useEffect(() => {
+    const fetchPromotions = async () => {
+      try {
+        const promotions = await api.get<Promotion[]>('/products/promotions/active');
+        if (promotions && promotions.length > 0) {
+          const mapped: Slide[] = promotions.map((p, idx) => ({
+            id: idx + 1,
+            tag: p.tagLine,
+            title: p.title,
+            description: p.description,
+            cta: 'Shop Now',
+            bgClass: '',
+            imageUrl: p.imageUrl,
+            productId: p.productId,
+          }));
+          setSlides(mapped);
+          setSlide([0, 0]);
+        } else {
+          setSlides(defaultSlides);
+        }
+      } catch (err) {
+        console.error('Failed to load active promotions:', err);
+        setSlides(defaultSlides);
+      }
+    };
+    fetchPromotions();
+  }, []);
 
   // Auto-rotate every 5 seconds
   useEffect(() => {
@@ -104,7 +146,7 @@ export const HeroBanner = () => {
     return () => clearInterval(timer);
   }, [paginate]);
 
-  const currentSlide = slides[currentIndex];
+  const currentSlide = slides[currentIndex] || defaultSlides[0];
 
   return (
     <section className="hero-banner">
@@ -120,7 +162,19 @@ export const HeroBanner = () => {
           transition={{ duration: 0.5, ease: 'easeInOut' as const }}
         >
           {/* Background with zoom animation */}
-          <div className={`hero-slide-bg ${currentSlide.bgClass}`} key={`bg-${currentSlide.id}`} />
+          <div
+            className={`hero-slide-bg ${currentSlide.bgClass}`}
+            key={`bg-${currentSlide.id}`}
+            style={
+              currentSlide.imageUrl
+                ? {
+                    backgroundImage: `url(${currentSlide.imageUrl})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }
+                : undefined
+            }
+          />
           <div className="hero-slide-overlay" />
 
           {/* Content */}
@@ -161,7 +215,9 @@ export const HeroBanner = () => {
               initial="hidden"
               animate="visible"
               custom={0.55}
-              onClick={() => navigate('/')}
+              onClick={() =>
+                navigate(currentSlide.productId ? `/product/${currentSlide.productId}` : '/')
+              }
             >
               {currentSlide.cta}
               <ArrowRight size={16} strokeWidth={1.5} />

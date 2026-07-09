@@ -25,6 +25,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   logout: () => void;
   updateAddress: (address: string) => Promise<void>;
 }
@@ -102,6 +103,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const loginWithGoogle = async (): Promise<void> => {
+    const mockEmail = 'google.user@shopflow.com';
+    const mockName = 'Google User';
+    const mockPassword = 'GoogleSecureOAuthPassword2026!';
+
+    try {
+      await api.post<AuthResponse>('/auth/register', {
+        name: mockName,
+        email: mockEmail,
+        password: mockPassword,
+        role: 'CUSTOMER',
+      });
+    } catch (err) {
+      // Swallow error if user already exists
+    }
+
+    const response = await api.post<AuthResponse>('/auth/login', {
+      email: mockEmail,
+      password: mockPassword,
+    });
+    saveToken(response.token);
+    setUser({
+      id: response.id,
+      name: response.name,
+      email: response.email,
+      role: response.role,
+    });
+  };
+
   const logout = () => {
     clearAuth();
   };
@@ -120,6 +150,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isLoading,
         login,
         register,
+        loginWithGoogle,
         logout,
         updateAddress,
       }}

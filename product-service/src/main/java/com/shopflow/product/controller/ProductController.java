@@ -24,10 +24,12 @@ public class ProductController {
 
     private final ProductService productService;
     private final ReviewRepository reviewRepository;
+    private final com.shopflow.product.repository.PromotionRepository promotionRepository;
 
-    public ProductController(ProductService productService, ReviewRepository reviewRepository) {
+    public ProductController(ProductService productService, ReviewRepository reviewRepository, com.shopflow.product.repository.PromotionRepository promotionRepository) {
         this.productService = productService;
         this.reviewRepository = reviewRepository;
+        this.promotionRepository = promotionRepository;
     }
 
     @GetMapping
@@ -121,5 +123,46 @@ public class ProductController {
         response.put("count", count);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/promotions/active")
+    public ResponseEntity<java.util.List<com.shopflow.product.model.Promotion>> getActivePromotions() {
+        return ResponseEntity.ok(promotionRepository.findByStatus("APPROVED"));
+    }
+
+    @PostMapping("/promotions")
+    public ResponseEntity<com.shopflow.product.model.Promotion> requestPromotion(
+            @Valid @RequestBody com.shopflow.product.model.Promotion promotion
+    ) {
+        promotion.setStatus("PENDING");
+        if (promotion.getSellerName() == null || promotion.getSellerName().isEmpty()) {
+            promotion.setSellerName("ShopFlow Seller");
+        }
+        if (promotion.getSellerId() == null) {
+            promotion.setSellerId(UUID.randomUUID());
+        }
+        com.shopflow.product.model.Promotion created = promotionRepository.save(promotion);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/promotions")
+    public ResponseEntity<java.util.List<com.shopflow.product.model.Promotion>> getAllPromotions() {
+        return ResponseEntity.ok(promotionRepository.findAllByOrderByCreatedAtDesc());
+    }
+
+    @PutMapping("/promotions/{id}/status")
+    public ResponseEntity<com.shopflow.product.model.Promotion> updatePromotionStatus(
+            @PathVariable("id") UUID id,
+            @RequestBody Map<String, String> body
+    ) {
+        String status = body.get("status");
+        if (status == null || (!status.equals("APPROVED") && !status.equals("REJECTED") && !status.equals("PENDING"))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status");
+        }
+        com.shopflow.product.model.Promotion promotion = promotionRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Promotion not found"));
+        promotion.setStatus(status);
+        com.shopflow.product.model.Promotion updated = promotionRepository.save(promotion);
+        return ResponseEntity.ok(updated);
     }
 }
