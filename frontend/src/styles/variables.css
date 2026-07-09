@@ -1,0 +1,24 @@
+:root {
+  --font-heading: 'Syne', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Default Light Mode (High-Contrast White) */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F5F7;
+  --color-accent: #10B981;
+  --color-active: #000000;
+  --color-text-main: #000000;
+  --color-text-muted: #6B7280;
+  --color-border: rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme="dark"] {
+  /* Dark Mode (Void Black) */
+  --bg-primary: #050505;
+  --bg-secondary: #121212;
+  --color-accent: #10B981;
+  --color-active: #FFFFFF;
+  --color-text-main: #FFFFFF;
+  --color-text-muted: #9CA3AF;
+  --color-border: rgba(255, 255, 255, 0.08);
+}

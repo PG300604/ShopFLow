@@ -1,0 +1,223 @@
+/* ═══════════════════════════════════════════════════════
+   LoginPage — Glassmorphism Auth Card
+   ═══════════════════════════════════════════════════════ */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 1.5rem 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative background shapes */
+.login-page::before,
+.login-page::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.login-page::before {
+  width: 500px;
+  height: 500px;
+  background: var(--color-accent);
+  top: -15%;
+  right: -10%;
+}
+
+.login-page::after {
+  width: 400px;
+  height: 400px;
+  background: var(--color-accent);
+  bottom: -20%;
+  left: -8%;
+}
+
+/* ── Glass Card ─────────────────────────────────────── */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 2.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background-color: rgba(245, 245, 247, 0.7);
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-theme="dark"] .login-card {
+  background-color: rgba(18, 18, 18, 0.75);
+}
+
+/* ── Header ─────────────────────────────────────────── */
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-header__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--color-border);
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+}
+
+.login-header__title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-active);
+  margin: 0 0 0.35rem;
+}
+
+.login-header__subtitle {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Form ───────────────────────────────────────────── */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.login-field {
+  position: relative;
+}
+
+.login-field__input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background-color: var(--bg-primary);
+  color: var(--color-text-main);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-field__input:focus {
+  border-color: var(--color-active);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.08);
+}
+
+.login-field__input::placeholder {
+  color: transparent;
+}
+
+.login-field__icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.login-field__input:focus ~ .login-field__icon {
+  color: var(--color-active);
+}
+
+/* Floating label */
+.login-field__label {
+  position: absolute;
+  left: 2.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  transition: all 0.2s ease;
+  background: var(--bg-primary);
+  padding: 0 0.25rem;
+}
+
+.login-field__input:focus ~ .login-field__label,
+.login-field__input:not(:placeholder-shown) ~ .login-field__label {
+  top: 0;
+  left: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-active);
+}
+
+/* ── Error Message ──────────────────────────────────── */
+.login-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  border-radius: 4px;
+  background-color: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* ── Submit Button ──────────────────────────────────── */
+.login-submit {
+  width: 100%;
+  padding: 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background-color: var(--color-active);
+  color: var(--bg-primary);
+  border: 1px solid var(--color-active);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  margin-top: 0.25rem;
+}
+
+.login-submit:hover {
+  opacity: 0.85;
+}
+
+.login-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Footer Link ────────────────────────────────────── */
+.login-footer {
+  text-align: center;
+  margin-top: 1.75rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.login-footer__link {
+  color: var(--color-active);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s ease;
+}
+
+.login-footer__link:hover {
+  color: var(--color-accent);
+}

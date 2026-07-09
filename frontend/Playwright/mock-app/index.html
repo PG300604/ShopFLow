@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopFlow Mock App</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --primary-color: #0066cc;
+      --card-bg: #f5f5f5;
+      --border-color: #dddddd;
+    }
+    .dark-theme {
+      --bg-color: #121212;
+      --text-color: #f5f5f5;
+      --primary-color: #3399ff;
+      --card-bg: #1e1e1e;
+      --border-color: #333333;
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    /* Carousel */
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .slide {
+      display: none;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .slide.active {
+      display: flex;
+    }
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.5);
+      color: white;
+      padding: 10px;
+    }
+    .carousel-btn.prev { left: 10px; }
+    .carousel-btn.next { right: 10px; }
+
+    /* Layout */
+    .main-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+    /* Product Grid */
+    .products-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .product-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 15px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .product-card h3 {
+      margin-top: 0;
+    }
+
+    /* Cart Drawer */
+    .cart-drawer {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      border-radius: 8px;
+      height: fit-content;
+    }
+    .cart-items {
+      list-style: none;
+      padding: 0;
+      margin: 15px 0;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    /* Details and reviews */
+    .detail-section {
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      background-color: var(--card-bg);
+    }
+    .reviews-list {
+      margin-top: 15px;
+    }
+    .review-item {
+      background: rgba(0,0,0,0.05);
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    /* Checkout & Stripe */
+    .checkout-section {
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      background-color: var(--card-bg);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      background: var(--bg-color);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
+    #payment-element {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 4px;
+      background: #fdfdfd;
+      color: #333;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body class="light-theme">
+
+  <header>
+    <h1>ShopFlow Store</h1>
+    <div>
+      <span id="theme-display">Light Mode</span>
+      <button id="theme-toggle">Toggle Theme</button>
+    </div>
+  </header>
+
+  <!-- Carousel Banner -->
+  <div class="carousel-container">
+    <div class="slide active">Slide 1: Summer Sale - Up to 50% Off!</div>
+    <div class="slide">Slide 2: New Arrivals - Shop Now!</div>
+    <div class="slide">Slide 3: Free Shipping on orders over $50!</div>
+    <button class="carousel-btn prev" id="prev-slide">&lt;</button>
+    <button class="carousel-btn next" id="next-slide">&gt;</button>
+  </div>
+
+  <div class="main-content">
+    <!-- Products & Details -->
+    <div class="left-pane">
+      <div class="products-section">
+        <h2>Product Catalog</h2>
+        <div class="filters">
+          <button class="filter-btn" data-category="all">All</button>
+          <button class="filter-btn" data-category="Kitchen">Kitchen</button>
+          <button class="filter-btn" data-category="Electronics">Electronics</button>
+          <button class="filter-btn" data-category="Office">Office</button>
+        </div>
+        <div class="product-grid" id="product-grid">
+          <!-- Dynamically loaded -->
+        </div>
+      </div>
+
+      <!-- Product Details & Reviews -->
+      <div class="detail-section" id="detail-section" style="display:none;">
+        <h2 id="detail-title">Product Details</h2>
+        <p id="detail-desc"></p>
+        <p><strong>Price:</strong> $<span id="detail-price"></span></p>
+        <h3>Customer Reviews</h3>
+        <div class="reviews-list" id="reviews-list">
+          <!-- Reviews list -->
+        </div>
+        <form id="review-form">
+          <h4>Submit a Review</h4>
+          <div class="form-group">
+            <label for="review-rating">Rating (1-5):</label>
+            <input type="number" id="review-rating" min="1" max="5" required>
+          </div>
+          <div class="form-group">
+            <label for="review-comment">Comment:</label>
+            <input type="text" id="review-comment" required>
+          </div>
+          <button type="submit">Submit Review</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Pane: Cart & Checkout -->
+    <div class="right-pane">
+      <!-- Cart Drawer -->
+      <div class="cart-drawer">
+        <h2>Shopping Cart</h2>
+        <ul class="cart-items" id="cart-items">
+          <li id="empty-cart-msg">Your cart is empty.</li>
+        </ul>
+        <div style="margin-bottom: 10px;">
+          <strong>Total:</strong> $<span id="cart-total">0.00</span>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button id="sync-cart">Sync Cart</button>
+          <button id="clear-cart" style="background:#cc3333;">Clear</button>
+        </div>
+        <div id="sync-status" style="margin-top:10px; font-weight:bold;"></div>
+      </div>
+
+      <!-- Checkout Form -->
+      <div class="checkout-section">
+        <h2>Checkout</h2>
+        <form id="checkout-form">
+          <div class="form-group">
+            <label for="checkout-name">Full Name</label>
+            <input type="text" id="checkout-name" required>
+          </div>
+          <div class="form-group">
+            <label for="checkout-email">Email Address</label>
+            <input type="email" id="checkout-email" required>
+          </div>
+          <div class="form-group">
+            <label>Credit Card Details</label>
+            <div id="payment-element">
+              <!-- Simulate Stripe Card Input -->
+              <input type="text" id="stripe-card-number" placeholder="4242 4242 4242 4242" style="border:none; outline:none; width:100%;">
+            </div>
+          </div>
+          <button type="submit" id="submit-payment" style="width:100%; padding:12px;">Pay Now</button>
+        </form>
+        <div id="payment-message" style="margin-top:15px; font-weight:bold; color:green;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Theme Switcher & Persistence
+    const body = document.body;
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeDisplay = document.getElementById('theme-display');
+
+    function setTheme(theme) {
+      if (theme === 'dark') {
+        body.classList.remove('light-theme');
+        body.classList.add('dark-theme');
+        themeDisplay.textContent = 'Dark Mode';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        body.classList.remove('dark-theme');
+        body.classList.add('light-theme');
+        themeDisplay.textContent = 'Light Mode';
+        localStorage.setItem('theme', 'light');
+      }
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = body.classList.contains('dark-theme') ? 'light' : 'dark';
+      setTheme(currentTheme);
+    });
+
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+
+    // Carousel
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    function showSlide(index) {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (index + slides.length) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }
+    document.getElementById('prev-slide').addEventListener('click', () => showSlide(currentSlide - 1));
+    document.getElementById('next-slide').addEventListener('click', () => showSlide(currentSlide + 1));
+
+    // Cart State
+    let cart = [];
+    try {
+      cart = JSON.parse(localStorage.getItem('cart')) || [];
+    } catch(e) {
+      cart = [];
+    }
+
+    function updateCartUI() {
+      const cartItemsEl = document.getElementById('cart-items');
+      const cartTotalEl = document.getElementById('cart-total');
+      cartItemsEl.innerHTML = '';
+      
+      if (cart.length === 0) {
+        cartItemsEl.innerHTML = '<li id="empty-cart-msg">Your cart is empty.</li>';
+        cartTotalEl.textContent = '0.00';
+      } else {
+        let total = 0;
+        cart.forEach((item, index) => {
+          const li = document.createElement('li');
+          li.className = 'cart-item';
+          li.innerHTML = `
+            <span>${item.name} (x${item.quantity})</span>
+            <span>$${(item.price * item.quantity).toFixed(2)}</span>
+          `;
+          cartItemsEl.appendChild(li);
+          total += item.price * item.quantity;
+        });
+        cartTotalEl.textContent = total.toFixed(2);
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    document.getElementById('clear-cart').addEventListener('click', () => {
+      cart = [];
+      updateCartUI();
+    });
+
+    // Sync Cart
+    document.getElementById('sync-cart').addEventListener('click', async () => {
+      const syncStatus = document.getElementById('sync-status');
+      syncStatus.textContent = 'Syncing...';
+      try {
+        const response = await fetch('/api/cart/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cartItems: cart })
+        });
+        const data = await response.json();
+        if (data.success) {
+          syncStatus.textContent = `Cart synced successfully! (${data.syncedCount} items)`;
+        } else {
+          syncStatus.textContent = 'Sync failed.';
+        }
+      } catch (err) {
+        syncStatus.textContent = 'Sync offline (mock success)';
+      }
+    });
+
+    // Products Loading
+    let allProducts = [];
+    async function loadProducts() {
+      const grid = document.getElementById('product-grid');
+      try {
+        const res = await fetch('/api/products');
+        allProducts = await res.json();
+      } catch (err) {
+        // Fallback default products
+        allProducts = [
+          { id: 1, name: 'Premium Coffee Mug', price: 15.99, category: 'Kitchen', rating: 4.5 },
+          { id: 2, name: 'Wireless Bluetooth Earbuds', price: 49.99, category: 'Electronics', rating: 4.2 },
+          { id: 3, name: 'Ergonomic Desk Chair', price: 199.99, category: 'Office', rating: 4.8 },
+        ];
+      }
+      renderProducts('all');
+    }
+
+    function renderProducts(category) {
+      const grid = document.getElementById('product-grid');
+      grid.innerHTML = '';
+      const filtered = category === 'all' ? allProducts : allProducts.filter(p => p.category === category);
+      filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <h3>${p.name}</h3>
+          <p>Category: ${p.category}</p>
+          <p>Rating: ${p.rating} / 5</p>
+          <p>Price: $${p.price.toFixed(2)}</p>
+          <div style="display:flex; gap:5px; margin-top:10px;">
+            <button class="add-to-cart-btn" data-id="${p.id}">Add to Cart</button>
+            <button class="view-details-btn" data-id="${p.id}">Details</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      // Bind events
+      document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = parseInt(e.target.getAttribute('data-id'));
+          const prod = allProducts.find(p => p.id === id);
+          if (prod) {
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+              existing.quantity++;
+            } else {
+              cart.push({ ...prod, quantity: 1 });
+            }
+            updateCartUI();
+          }
+        });
+      });
+
+      document.querySelectorAll('.view-details-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = parseInt(e.target.getAttribute('data-id'));
+          showProductDetails(id);
+        });
+      });
+    }
+
+    // Filters
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const cat = e.target.getAttribute('data-category');
+        renderProducts(cat);
+      });
+    });
+
+    // Product Details & Reviews
+    let activeProductId = null;
+    let productReviews = {}; // store reviews locally by product ID
+
+    function showProductDetails(id) {
+      activeProductId = id;
+      const prod = allProducts.find(p => p.id === id);
+      if (!prod) return;
+
+      document.getElementById('detail-section').style.display = 'block';
+      document.getElementById('detail-title').textContent = prod.name;
+      document.getElementById('detail-desc').textContent = `High-quality ${prod.name} that fits perfectly into your ${prod.category} collection. Best-in-class performance.`;
+      document.getElementById('detail-price').textContent = prod.price.toFixed(2);
+
+      renderReviews(id);
+    }
+
+    function renderReviews(productId) {
+      const listEl = document.getElementById('reviews-list');
+      listEl.innerHTML = '';
+      const reviews = productReviews[productId] || [
+        { rating: 5, comment: 'Excellent product, highly recommended!' },
+        { rating: 4, comment: 'Good quality for the price.' }
+      ];
+      reviews.forEach(r => {
+        const item = document.createElement('div');
+        item.className = 'review-item';
+        item.innerHTML = `<strong>Rating: ${r.rating}/5</strong><p>${r.comment}</p>`;
+        listEl.appendChild(item);
+      });
+    }
+
+    document.getElementById('review-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const rating = parseInt(document.getElementById('review-rating').value);
+      const comment = document.getElementById('review-comment').value;
+      if (!activeProductId) return;
+
+      if (!productReviews[activeProductId]) {
+        productReviews[activeProductId] = [
+          { rating: 5, comment: 'Excellent product, highly recommended!' },
+          { rating: 4, comment: 'Good quality for the price.' }
+        ];
+      }
+      productReviews[activeProductId].push({ rating, comment });
+      renderReviews(activeProductId);
+      document.getElementById('review-form').reset();
+    });
+
+    // Checkout & Mock Stripe Submission
+    document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payMsg = document.getElementById('payment-message');
+      payMsg.textContent = 'Processing payment...';
+      payMsg.style.color = 'orange';
+
+      // Simulate Stripe integration fetch
+      try {
+        const res = await fetch('/api/create-payment-intent', { method: 'POST' });
+        const data = await res.json();
+        
+        // Mock Stripe payment success delay
+        setTimeout(() => {
+          payMsg.textContent = 'Payment successful! Order confirmed.';
+          payMsg.style.color = 'green';
+          cart = [];
+          updateCartUI();
+          document.getElementById('checkout-form').reset();
+        }, 1000);
+      } catch (err) {
+        setTimeout(() => {
+          payMsg.textContent = 'Payment successful (mock offline mode)!';
+          payMsg.style.color = 'green';
+          cart = [];
+          updateCartUI();
+          document.getElementById('checkout-form').reset();
+        }, 1000);
+      }
+    });
+
+    // Init
+    loadProducts();
+    updateCartUI();
+  </script>
+</body>
+</html>
