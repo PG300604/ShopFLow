@@ -21,7 +21,7 @@ export const Header = () => {
     const val = e.target.value;
     setSearchQuery(val);
     if (val.trim()) {
-      navigate(`/?q=${encodeURIComponent(val)}`);
+      navigate(`/search?q=${encodeURIComponent(val)}`);
     } else {
       navigate('/');
     }

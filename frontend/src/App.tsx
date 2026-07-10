@@ -12,6 +12,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { PromotionsPage } from './pages/PromotionsPage';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { SearchResultsPage } from './pages/SearchResultsPage';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
                 <Route path="checkout" element={<CheckoutPage />} />
                 <Route path="promotions" element={<PromotionsPage />} />
                 <Route path="admin" element={<AdminDashboard />} />
+                <Route path="search" element={<SearchResultsPage />} />
               </Route>
             </Routes>
           </BrowserRouter>
