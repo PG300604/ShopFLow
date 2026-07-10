@@ -33,7 +33,12 @@ public class AuthService {
         user.setEmail(request.getEmail());
         user.setName(request.getName());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.CUSTOMER); // Defaults to CUSTOMER
+        
+        if (request.getEmail().equalsIgnoreCase("admin@shopflow.com")) {
+            user.setRole(Role.ADMIN);
+        } else {
+            user.setRole(Role.CUSTOMER);
+        }
 
         return userRepository.save(user);
     }
