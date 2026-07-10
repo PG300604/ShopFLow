@@ -43,13 +43,22 @@ function fuzzyMatch(text: string, query: string): boolean {
 
   return queryWords.every((qWord) => {
     if (qWord.length === 0) return true;
+    
+    // Stop words to ignore for matching
+    const stopWords = ['a', 'an', 'the', 'to', 'of', 'in', 'for', 'and', 'on', 'is', 'it', 'with'];
+    if (stopWords.includes(qWord)) return true;
+
     return textWords.some((tWord) => {
-      // Direct substring match
-      if (tWord.includes(qWord) || qWord.includes(tWord)) return true;
+      // 1. Exact or substring match (document word contains query word)
+      if (tWord.includes(qWord)) return true;
       
-      // Typo tolerance (Levenshtein)
-      const maxDistance = qWord.length <= 4 ? 1 : 2;
-      return getLevenshteinDistance(tWord, qWord) <= maxDistance;
+      // 2. Typo tolerance (only for words of length >= 3 to avoid false matches)
+      if (qWord.length >= 3 && tWord.length >= 3) {
+        const maxDistance = qWord.length <= 4 ? 1 : 2;
+        return getLevenshteinDistance(tWord, qWord) <= maxDistance;
+      }
+      
+      return false;
     });
   });
 }
