@@ -56,10 +56,17 @@ export const CatalogPage: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await api.get<Product[]>('/products');
-        setProducts(res);
+        const res = await api.get<any>('/products');
+        if (res && Array.isArray(res)) {
+          setProducts(res);
+        } else if (res && res.content && Array.isArray(res.content)) {
+          setProducts(res.content);
+        } else {
+          setProducts([]);
+        }
       } catch (err) {
         console.error('Failed to fetch products:', err);
+        setProducts([]);
       } finally {
         setLoading(false);
       }

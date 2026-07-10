@@ -88,19 +88,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const register = async (name: string, email: string, password: string): Promise<void> => {
-    const response = await api.post<AuthResponse>('/auth/register', {
+    await api.post('/auth/register', {
       name,
       email,
       password,
-      role: 'CUSTOMER',
     });
-    saveToken(response.token);
-    setUser({
-      id: response.id,
-      name: response.name,
-      email: response.email,
-      role: response.role,
-    });
+    await login(email, password);
   };
 
   const loginWithGoogle = async (): Promise<void> => {
