@@ -1,5 +1,6 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { Sun, Moon, Monitor, ShoppingBag, User, LogOut } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Sun, Moon, Monitor, ShoppingBag, User, LogOut, Search } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -9,6 +10,22 @@ export const Header = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const { itemCount, toggleCart } = useCart();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+
+  useEffect(() => {
+    setSearchQuery(searchParams.get('q') || '');
+  }, [searchParams]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    if (val.trim()) {
+      navigate(`/?q=${encodeURIComponent(val)}`);
+    } else {
+      navigate('/');
+    }
+  };
 
   const toggleTheme = () => {
     if (theme === 'light') {
@@ -44,24 +61,27 @@ export const Header = () => {
           SHOPFLOW
         </Link>
 
-        {/* Nav Links */}
-        <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center', fontSize: '0.9rem', fontWeight: 500 }}>
-          <Link to="/" style={{ color: 'var(--color-text-main)' }}>Home</Link>
-          {isAuthenticated && (
-            <>
-              <Link to="/profile" style={{ color: 'var(--color-text-main)' }}>Profile</Link>
-              {user?.role === 'ADMIN' && (
-                <>
-                  <Link to="/admin" style={{ color: 'var(--color-text-main)' }}>Admin</Link>
-                  <Link to="/promotions" style={{ color: 'var(--color-text-main)' }}>Promotions</Link>
-                </>
-              )}
-            </>
-          )}
-        </nav>
+        {/* Header Search Bar */}
+        <div className="header-search-container">
+          <div className="header-search">
+            <Search size={16} className="header-search-icon" strokeWidth={1.5} />
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </div>
+        </div>
 
-        {/* Actions (User, Cart, Theme) */}
+        {/* Actions (User, Cart, Theme, Admin) */}
         <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
+          {isAuthenticated && (user?.role === 'ADMIN' || user?.email === 'admin@shopflow.com') && (
+            <div style={{ display: 'flex', gap: '1rem', marginRight: '0.5rem' }}>
+              <Link to="/admin" style={{ color: 'var(--color-text-main)', fontSize: '0.85rem', fontWeight: 600 }}>Admin</Link>
+              <Link to="/promotions" style={{ color: 'var(--color-text-main)', fontSize: '0.85rem', fontWeight: 600 }}>Promotions</Link>
+            </div>
+          )}
           <button
             onClick={toggleTheme}
             style={{
