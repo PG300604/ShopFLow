@@ -46,11 +46,16 @@ export const Header = () => {
 
         {/* Nav Links */}
         <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center', fontSize: '0.9rem', fontWeight: 500 }}>
-          <Link to="/" style={{ color: 'var(--color-text-main)' }}>Catalog</Link>
+          <Link to="/" style={{ color: 'var(--color-text-main)' }}>Home</Link>
           {isAuthenticated && (
             <>
               <Link to="/profile" style={{ color: 'var(--color-text-main)' }}>Profile</Link>
-              <Link to="/promotions" style={{ color: 'var(--color-text-main)' }}>Promotions</Link>
+              {user?.role === 'ADMIN' && (
+                <>
+                  <Link to="/admin" style={{ color: 'var(--color-text-main)' }}>Admin</Link>
+                  <Link to="/promotions" style={{ color: 'var(--color-text-main)' }}>Promotions</Link>
+                </>
+              )}
             </>
           )}
         </nav>

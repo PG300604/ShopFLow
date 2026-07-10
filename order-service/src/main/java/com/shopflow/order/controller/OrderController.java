@@ -51,6 +51,24 @@ public class OrderController {
         return ResponseEntity.ok(updatedOrder);
     }
 
+    @PutMapping("/{id}/admin-status")
+    public ResponseEntity<Order> adminUpdateStatus(
+            @PathVariable("id") UUID id,
+            @RequestBody java.util.Map<String, String> body
+    ) {
+        String status = body.get("status");
+        if (status == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            OrderStatus orderStatus = OrderStatus.valueOf(status);
+            Order updatedOrder = orderService.updateOrderStatus(id, orderStatus);
+            return ResponseEntity.ok(updatedOrder);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     private UUID getAuthenticatedUserId() {
         String principal = (String) org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return UUID.fromString(principal);

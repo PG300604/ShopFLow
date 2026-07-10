@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, ShoppingCart, Star, Send, MessageSquare } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ShoppingCart, Star, Send, MessageSquare, Share2, Check } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
@@ -58,6 +58,15 @@ export const DetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { addItem } = useCart();
   const { isAuthenticated } = useAuth();
+  const [showShareToast, setShowShareToast] = useState(false);
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setShowShareToast(true);
+    setTimeout(() => {
+      setShowShareToast(false);
+    }, 2500);
+  };
 
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -223,6 +232,10 @@ export const DetailPage: React.FC = () => {
             <Link to="/checkout" className="detail-buy-btn">
               Instant Buy
             </Link>
+            <button className="detail-share-btn" onClick={handleShare}>
+              <Share2 size={16} strokeWidth={1.5} />
+              Share
+            </button>
           </div>
         </motion.div>
       </div>
@@ -364,6 +377,22 @@ export const DetailPage: React.FC = () => {
           </div>
         )}
       </motion.div>
+
+      {/* Toast Alert */}
+      <AnimatePresence>
+        {showShareToast && (
+          <motion.div
+            className="share-toast"
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+          >
+            <Check size={16} strokeWidth={2} />
+            Link copied to clipboard!
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
