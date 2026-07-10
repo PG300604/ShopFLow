@@ -105,13 +105,16 @@ export const AdminDashboard: React.FC = () => {
     try {
       const [prodRes, orderRes, promoRes] = await Promise.all([
         api.get<any>('/products?size=100'),
-        api.get<Order[]>('/orders'),
+        api.get<any>('/orders'),
         api.get<Promotion[]>('/products/promotions'),
       ]);
 
       const prodArray = prodRes && Array.isArray(prodRes) ? prodRes : (prodRes?.content || []);
       setProducts(prodArray);
-      setOrders(orderRes || []);
+      
+      const orderArray = orderRes && Array.isArray(orderRes) ? orderRes : (orderRes?.content || []);
+      setOrders(orderArray);
+      
       setPromotions(promoRes || []);
     } catch (err) {
       console.error('Failed to load admin dashboard data:', err);
