@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
@@ -8,10 +7,14 @@ import { CatalogPage } from './pages/CatalogPage';
 import { DetailPage } from './pages/DetailPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { SellerLoginPage } from './pages/SellerLoginPage';
+import { SellerRegisterPage } from './pages/SellerRegisterPage';
+import { SellerDashboard } from './pages/SellerDashboard';
+import { AdminLoginPage } from './pages/AdminLoginPage';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { ProfilePage } from './pages/ProfilePage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { PromotionsPage } from './pages/PromotionsPage';
-import { AdminDashboard } from './pages/AdminDashboard';
 import { SearchResultsPage } from './pages/SearchResultsPage';
 
 function App() {
@@ -26,10 +29,14 @@ function App() {
                 <Route path="product/:id" element={<DetailPage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="register" element={<RegisterPage />} />
+                <Route path="seller/login" element={<SellerLoginPage />} />
+                <Route path="seller/register" element={<SellerRegisterPage />} />
+                <Route path="seller/dashboard" element={<SellerDashboard />} />
+                <Route path="admin/login" element={<AdminLoginPage />} />
+                <Route path="admin/dashboard" element={<AdminDashboard />} />
                 <Route path="profile" element={<ProfilePage />} />
                 <Route path="checkout" element={<CheckoutPage />} />
                 <Route path="promotions" element={<PromotionsPage />} />
-                <Route path="admin" element={<AdminDashboard />} />
                 <Route path="search" element={<SearchResultsPage />} />
               </Route>
             </Routes>

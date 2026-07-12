@@ -74,12 +74,39 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* Actions (User, Cart, Theme, Admin) */}
+        {/* Actions (User, Cart, Theme, Admin, Seller) */}
         <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
+          {/* Sell on ShopFlow link for guest users or customers */}
+          {(!isAuthenticated || (user && user.role !== 'SELLER' && user.role !== 'ADMIN' && user.email !== 'admin@shopflow.com')) && (
+            <Link
+              to="/seller/register"
+              style={{
+                color: 'var(--color-text-muted)',
+                fontSize: '0.8rem',
+                marginRight: '0.5rem',
+                textDecoration: 'none',
+                fontWeight: 500,
+                transition: 'color 0.2s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-active)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-muted)'; }}
+            >
+              Sell on ShopFlow
+            </Link>
+          )}
+
+          {/* Admin Links */}
           {isAuthenticated && (user?.role === 'ADMIN' || user?.email === 'admin@shopflow.com') && (
             <div style={{ display: 'flex', gap: '1rem', marginRight: '0.5rem' }}>
-              <Link to="/admin" style={{ color: 'var(--color-text-main)', fontSize: '0.85rem', fontWeight: 600 }}>Admin</Link>
+              <Link to="/admin/dashboard" style={{ color: 'var(--color-text-main)', fontSize: '0.85rem', fontWeight: 600 }}>Admin</Link>
               <Link to="/promotions" style={{ color: 'var(--color-text-main)', fontSize: '0.85rem', fontWeight: 600 }}>Promotions</Link>
+            </div>
+          )}
+
+          {/* Seller Links */}
+          {isAuthenticated && user?.role === 'SELLER' && (
+            <div style={{ display: 'flex', gap: '1rem', marginRight: '0.5rem' }}>
+              <Link to="/seller/dashboard" style={{ color: 'var(--color-text-main)', fontSize: '0.85rem', fontWeight: 600 }}>Seller Dashboard</Link>
             </div>
           )}
           <button

@@ -20,8 +20,14 @@ export const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      await login(email, password);
-      navigate('/');
+      const loggedUser = await login(email, password);
+      if (loggedUser.role === 'ADMIN' || loggedUser.email === 'admin@shopflow.com') {
+        navigate('/admin/dashboard');
+      } else if (loggedUser.role === 'SELLER') {
+        navigate('/seller/dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (err: any) {
       const message =
         err?.response?.data?.message ||
@@ -46,12 +52,12 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleBypassLogin = async (type: 'CUSTOMER' | 'ADMIN') => {
+  const handleBypassLogin = async () => {
     setError('');
     setLoading(true);
-    const bypassEmail = type === 'ADMIN' ? 'admin@shopflow.com' : 'customer@shopflow.com';
+    const bypassEmail = 'customer@shopflow.com';
     const bypassPassword = 'password123';
-    const bypassName = type === 'ADMIN' ? 'ShopFlow Admin' : 'ShopFlow Customer';
+    const bypassName = 'ShopFlow Customer';
 
     try {
       await login(bypassEmail, bypassPassword);
@@ -197,7 +203,7 @@ export const LoginPage: React.FC = () => {
         <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
           <button
             type="button"
-            onClick={() => handleBypassLogin('CUSTOMER')}
+            onClick={handleBypassLogin}
             disabled={loading}
             className="login-bypass-btn"
             style={{
@@ -210,7 +216,8 @@ export const LoginPage: React.FC = () => {
               fontSize: '0.8rem',
               fontWeight: 500,
               cursor: 'pointer',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              textAlign: 'center'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = 'var(--color-active)';
@@ -222,34 +229,6 @@ export const LoginPage: React.FC = () => {
             }}
           >
             Bypass: Customer
-          </button>
-          <button
-            type="button"
-            onClick={() => handleBypassLogin('ADMIN')}
-            disabled={loading}
-            className="login-bypass-btn"
-            style={{
-              flex: 1,
-              padding: '0.65rem 1rem',
-              borderRadius: '4px',
-              border: '1px dashed var(--color-border)',
-              backgroundColor: 'transparent',
-              color: 'var(--color-text-muted)',
-              fontSize: '0.8rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-active)';
-              e.currentTarget.style.color = 'var(--color-active)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-border)';
-              e.currentTarget.style.color = 'var(--color-text-muted)';
-            }}
-          >
-            Bypass: Admin
           </button>
         </div>
 

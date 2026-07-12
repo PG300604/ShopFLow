@@ -8,6 +8,7 @@ export interface User {
   email: string;
   role: string;
   defaultShippingAddress?: string;
+  storeName?: string;
 }
 
 interface AuthResponse {
@@ -23,8 +24,9 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
+  register: (name: string, email: string, password: string) => Promise<User>;
+  registerSeller: (name: string, email: string, password: string, storeName: string) => Promise<User>;
   loginWithGoogle: () => Promise<void>;
   logout: () => void;
   updateAddress: (address: string) => Promise<void>;
@@ -76,24 +78,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     fetchProfile();
   }, [token, clearAuth]);
 
-  const login = async (email: string, password: string): Promise<void> => {
-    const response = await api.post<AuthResponse>('/auth/login', { email, password });
+  const login = async (email: string, password: string): Promise<User> => {
+    const response = await api.post<{ token: string }>('/auth/login', { email, password });
     saveToken(response.token);
-    setUser({
-      id: response.id,
-      name: response.name,
-      email: response.email,
-      role: response.role,
-    });
+    const profile = await api.get<User>('/auth/me');
+    setUser(profile);
+    return profile;
   };
 
-  const register = async (name: string, email: string, password: string): Promise<void> => {
+  const register = async (name: string, email: string, password: string): Promise<User> => {
     await api.post('/auth/register', {
       name,
       email,
       password,
     });
-    await login(email, password);
+    return await login(email, password);
+  };
+
+  const registerSeller = async (name: string, email: string, password: string, storeName: string): Promise<User> => {
+    await api.post('/auth/register/seller', {
+      name,
+      email,
+      password,
+      storeName,
+    });
+    return await login(email, password);
   };
 
   const loginWithGoogle = async (): Promise<void> => {
@@ -112,17 +121,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Swallow error if user already exists
     }
 
-    const response = await api.post<AuthResponse>('/auth/login', {
+    const response = await api.post<{ token: string }>('/auth/login', {
       email: mockEmail,
       password: mockPassword,
     });
     saveToken(response.token);
-    setUser({
-      id: response.id,
-      name: response.name,
-      email: response.email,
-      role: response.role,
-    });
+    const profile = await api.get<User>('/auth/me');
+    setUser(profile);
   };
 
   const logout = () => {
@@ -143,6 +148,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isLoading,
         login,
         register,
+        registerSeller,
         loginWithGoogle,
         logout,
         updateAddress,
