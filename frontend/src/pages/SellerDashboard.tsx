@@ -195,7 +195,16 @@ export const SellerDashboard: React.FC = () => {
     );
   };
 
-  if (isLoading || !isAuthenticated || user?.role !== 'SELLER') {
+  if (isLoading) {
+    return (
+      <div className="admin-loader" style={{ minHeight: '60vh' }}>
+        <Loader2 className="spinner" size={32} />
+        <p>Syncing storefront nodes...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || user?.role !== 'SELLER') {
     return null;
   }
 

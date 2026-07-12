@@ -237,7 +237,16 @@ export const AdminDashboard: React.FC = () => {
     );
   };
 
-  if (isLoading || !isAuthenticated || (user?.role !== 'ADMIN' && user?.email !== 'admin@shopflow.com')) {
+  if (isLoading) {
+    return (
+      <div className="admin-loader" style={{ minHeight: '60vh' }}>
+        <Loader2 className="spinner" size={32} />
+        <p>Syncing control panel nodes...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || (user?.role !== 'ADMIN' && user?.email !== 'admin@shopflow.com')) {
     return null;
   }
 
