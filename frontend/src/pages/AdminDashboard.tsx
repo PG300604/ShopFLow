@@ -62,7 +62,7 @@ interface Promotion {
 type TabType = 'overview' | 'products' | 'orders' | 'promotions';
 
 export const AdminDashboard: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -90,14 +90,15 @@ export const AdminDashboard: React.FC = () => {
 
   // Redirect non-admins
   useEffect(() => {
+    if (isLoading) return;
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate('/admin/login');
       return;
     }
     if (user?.role !== 'ADMIN' && user?.email !== 'admin@shopflow.com') {
       navigate('/');
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, isLoading, navigate]);
 
   // Load stats, products, orders, promotions
   const loadDashboardData = async () => {
@@ -236,7 +237,7 @@ export const AdminDashboard: React.FC = () => {
     );
   };
 
-  if (!isAuthenticated || (user?.role !== 'ADMIN' && user?.email !== 'admin@shopflow.com')) {
+  if (isLoading || !isAuthenticated || (user?.role !== 'ADMIN' && user?.email !== 'admin@shopflow.com')) {
     return null;
   }
 

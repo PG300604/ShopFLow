@@ -46,7 +46,7 @@ interface Order {
 }
 
 export const SellerDashboard: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders'>('overview');
@@ -73,6 +73,7 @@ export const SellerDashboard: React.FC = () => {
 
   // Redirect non-sellers
   useEffect(() => {
+    if (isLoading) return;
     if (!isAuthenticated) {
       navigate('/seller/login');
       return;
@@ -80,7 +81,7 @@ export const SellerDashboard: React.FC = () => {
     if (user?.role !== 'SELLER') {
       navigate('/');
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, isLoading, navigate]);
 
   // Load stats, products, orders
   const loadDashboardData = async () => {
@@ -194,7 +195,7 @@ export const SellerDashboard: React.FC = () => {
     );
   };
 
-  if (!isAuthenticated || user?.role !== 'SELLER') {
+  if (isLoading || !isAuthenticated || user?.role !== 'SELLER') {
     return null;
   }
 
