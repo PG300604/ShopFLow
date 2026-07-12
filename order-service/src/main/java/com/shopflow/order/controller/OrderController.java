@@ -123,6 +123,13 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/seller/mine")
+    public ResponseEntity<java.util.List<Order>> getSellerOrders() {
+        UUID sellerId = getAuthenticatedUserId();
+        java.util.List<Order> orders = orderService.getSellerOrders(sellerId);
+        return ResponseEntity.ok(orders);
+    }
+
     public static class StatusUpdateRequest {
         @NotNull(message = "Status is required")
         private OrderStatus status;

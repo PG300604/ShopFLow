@@ -45,6 +45,7 @@ public class ProductService {
         product.setPrice(productDetails.getPrice());
         product.setCategory(productDetails.getCategory());
         product.setImageUrl(productDetails.getImageUrl());
+        product.setSellerId(productDetails.getSellerId());
         return productRepository.save(product);
     }
 
@@ -52,5 +53,9 @@ public class ProductService {
     public void deleteProduct(UUID id) {
         Product product = getProductById(id);
         productRepository.delete(product);
+    }
+
+    public Page<Product> getProductsBySellerId(UUID sellerId, Pageable pageable) {
+        return productRepository.findBySellerId(sellerId, pageable);
     }
 }

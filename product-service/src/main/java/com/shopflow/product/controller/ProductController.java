@@ -53,8 +53,57 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+    private org.springframework.security.core.Authentication getAuth() {
+        return org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    private boolean isAdmin(org.springframework.security.core.Authentication auth) {
+        return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    private boolean isSeller(org.springframework.security.core.Authentication auth) {
+        return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SELLER"));
+    }
+
+    @GetMapping("/mine")
+    public ResponseEntity<Page<Product>> getMyProducts(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sortBy", defaultValue = "name") String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir
+    ) {
+        org.springframework.security.core.Authentication auth = getAuth();
+        if (auth == null || !auth.isAuthenticated() || !isSeller(auth)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+
+        UUID sellerId = UUID.fromString((String) auth.getPrincipal());
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.DESC.name()) ?
+                Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Product> products = productService.getProductsBySellerId(sellerId, pageable);
+        return ResponseEntity.ok(products);
+    }
+
     @PostMapping
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
+        org.springframework.security.core.Authentication auth = getAuth();
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+        }
+
+        if (isSeller(auth)) {
+            // Force the product's sellerId to be the seller's JWT user ID
+            product.setSellerId(UUID.fromString((String) auth.getPrincipal()));
+        } else if (isAdmin(auth)) {
+            // Admins can set it, or it defaults to DEFAULT_SELLER_ID
+            if (product.getSellerId() == null) {
+                product.setSellerId(Product.DEFAULT_SELLER_ID);
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+
         Product createdProduct = productService.createProduct(product);
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
@@ -64,12 +113,51 @@ public class ProductController {
             @PathVariable("id") UUID id,
             @Valid @RequestBody Product productDetails
     ) {
+        org.springframework.security.core.Authentication auth = getAuth();
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+        }
+
+        Product existing = productService.getProductById(id);
+
+        if (isSeller(auth)) {
+            UUID sellerId = UUID.fromString((String) auth.getPrincipal());
+            if (!existing.getSellerId().equals(sellerId)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied: you do not own this product");
+            }
+            // Sellers cannot change the sellerId of the product
+            productDetails.setSellerId(sellerId);
+        } else if (isAdmin(auth)) {
+            // Admins can update any product, and can change its sellerId or keep existing
+            if (productDetails.getSellerId() == null) {
+                productDetails.setSellerId(existing.getSellerId());
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+
         Product updatedProduct = productService.updateProduct(id, productDetails);
         return ResponseEntity.ok(updatedProduct);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") UUID id) {
+        org.springframework.security.core.Authentication auth = getAuth();
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+        }
+
+        Product existing = productService.getProductById(id);
+
+        if (isSeller(auth)) {
+            UUID sellerId = UUID.fromString((String) auth.getPrincipal());
+            if (!existing.getSellerId().equals(sellerId)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied: you do not own this product");
+            }
+        } else if (!isAdmin(auth)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }

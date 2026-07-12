@@ -37,12 +37,14 @@ public class OrderService {
     private final InventoryClient inventoryClient;
     private final NotificationClient notificationClient;
     private final CartItemRepository cartItemRepository;
+    private final com.shopflow.order.client.ProductClient productClient;
 
-    public OrderService(OrderRepository orderRepository, InventoryClient inventoryClient, NotificationClient notificationClient, CartItemRepository cartItemRepository) {
+    public OrderService(OrderRepository orderRepository, InventoryClient inventoryClient, NotificationClient notificationClient, CartItemRepository cartItemRepository, com.shopflow.order.client.ProductClient productClient) {
         this.orderRepository = orderRepository;
         this.inventoryClient = inventoryClient;
         this.notificationClient = notificationClient;
         this.cartItemRepository = cartItemRepository;
+        this.productClient = productClient;
     }
 
     public Order getOrderById(UUID id) {
@@ -83,16 +85,21 @@ public class OrderService {
 
                 successfulReservations.add(reservation.getReservationId());
 
-                // Create OrderItem (Mock price of $19.99 for Phase 1)
-                BigDecimal mockPrice = new BigDecimal("19.99");
+                // Create OrderItem (Fetch real price and sellerId from product-service)
+                com.shopflow.order.dto.ProductDto productDto = productClient.getProductById(item.getProductId());
+                if (productDto == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product " + item.getProductId() + " not found");
+                }
+
                 OrderItem orderItem = new OrderItem();
                 orderItem.setProductId(item.getProductId());
                 orderItem.setQuantity(item.getQuantity());
-                orderItem.setUnitPrice(mockPrice);
+                orderItem.setUnitPrice(productDto.getPrice());
+                orderItem.setSellerId(productDto.getSellerId());
                 orderItem.setReservationId(reservation.getReservationId());
                 order.addItem(orderItem);
 
-                totalAmount = totalAmount.add(mockPrice.multiply(BigDecimal.valueOf(item.getQuantity())));
+                totalAmount = totalAmount.add(productDto.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
             }
 
             order.setTotalAmount(totalAmount);
@@ -234,5 +241,47 @@ public class OrderService {
     @Transactional
     public void clearCart(UUID userId) {
         cartItemRepository.deleteByUserId(userId);
+    }
+
+    public List<Order> getSellerOrders(UUID sellerId) {
+        List<Order> originalOrders = orderRepository.findBySellerId(sellerId);
+        List<Order> sellerScopedOrders = new java.util.ArrayList<>();
+        
+        for (Order order : originalOrders) {
+            Order scopedOrder = new Order();
+            scopedOrder.setId(order.getId());
+            scopedOrder.setUserId(order.getUserId());
+            scopedOrder.setStatus(order.getStatus());
+            scopedOrder.setShippingAddress(order.getShippingAddress());
+            scopedOrder.setCreatedAt(order.getCreatedAt());
+            scopedOrder.setUpdatedAt(order.getUpdatedAt());
+            scopedOrder.setExpiresAt(order.getExpiresAt());
+            
+            List<com.shopflow.order.model.OrderItem> scopedItems = new java.util.ArrayList<>();
+            BigDecimal sellerTotal = BigDecimal.ZERO;
+            
+            for (com.shopflow.order.model.OrderItem item : order.getItems()) {
+                if (sellerId.equals(item.getSellerId())) {
+                    com.shopflow.order.model.OrderItem scopedItem = new com.shopflow.order.model.OrderItem();
+                    scopedItem.setId(item.getId());
+                    scopedItem.setProductId(item.getProductId());
+                    scopedItem.setQuantity(item.getQuantity());
+                    scopedItem.setUnitPrice(item.getUnitPrice());
+                    scopedItem.setSellerId(item.getSellerId());
+                    scopedItem.setReservationId(item.getReservationId());
+                    scopedItem.setOrder(scopedOrder);
+                    
+                    scopedItems.add(scopedItem);
+                    sellerTotal = sellerTotal.add(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+                }
+            }
+            
+            scopedOrder.setItems(scopedItems);
+            scopedOrder.setTotalAmount(sellerTotal);
+            
+            sellerScopedOrders.add(scopedOrder);
+        }
+        
+        return sellerScopedOrders;
     }
 }

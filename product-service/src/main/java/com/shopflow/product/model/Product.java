@@ -34,8 +34,14 @@ public class Product {
     @Column(nullable = false, length = 100)
     private String category;
 
+    public static final UUID DEFAULT_SELLER_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
     @Column(name = "image_url", length = 512)
     private String imageUrl;
+
+    @NotNull(message = "Seller ID is required")
+    @Column(name = "seller_id", nullable = false)
+    private UUID sellerId;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -46,6 +52,7 @@ public class Product {
     private LocalDateTime updatedAt;
 
     public Product() {
+        this.sellerId = DEFAULT_SELLER_ID;
     }
 
     public Product(String name, String description, BigDecimal price, String category, String imageUrl) {
@@ -54,6 +61,7 @@ public class Product {
         this.price = price;
         this.category = category;
         this.imageUrl = imageUrl;
+        this.sellerId = DEFAULT_SELLER_ID;
     }
 
     public UUID getId() {
@@ -118,5 +126,13 @@ public class Product {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public UUID getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(UUID sellerId) {
+        this.sellerId = sellerId;
     }
 }

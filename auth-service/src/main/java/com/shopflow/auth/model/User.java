@@ -38,6 +38,9 @@ public class User {
     @Column(name = "default_shipping_address", length = 500)
     private String defaultShippingAddress;
 
+    @Column(name = "store_name", length = 150)
+    private String storeName;
+
     public User() {
     }
 
@@ -110,5 +113,13 @@ public class User {
 
     public void setDefaultShippingAddress(String defaultShippingAddress) {
         this.defaultShippingAddress = defaultShippingAddress;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
     }
 }

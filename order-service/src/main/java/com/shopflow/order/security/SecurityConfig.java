@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/orders/{id}/status", "/error").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/orders/seller/mine").hasRole("SELLER")
                         .requestMatchers(HttpMethod.GET, "/orders").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/orders/*/admin-status").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/orders/checkout").hasAnyRole("CUSTOMER", "ADMIN")

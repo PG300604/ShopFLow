@@ -21,6 +21,9 @@ public class OrderItem {
     @Column(name = "product_id", nullable = false)
     private UUID productId;
 
+    @Column(name = "seller_id")
+    private UUID sellerId;
+
     @Column(nullable = false)
     private Integer quantity;
 
@@ -79,5 +82,13 @@ public class OrderItem {
 
     public void setReservationId(UUID reservationId) {
         this.reservationId = reservationId;
+    }
+
+    public UUID getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(UUID sellerId) {
+        this.sellerId = sellerId;
     }
 }

@@ -43,6 +43,24 @@ public class AuthService {
         return userRepository.save(user);
     }
 
+    public User registerSeller(RegisterRequest request) {
+        if (request.getStoreName() == null || request.getStoreName().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Store name is required for seller registration");
+        }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
+        }
+
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setName(request.getName());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setRole(Role.SELLER);
+        user.setStoreName(request.getStoreName().trim());
+
+        return userRepository.save(user);
+    }
+
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
