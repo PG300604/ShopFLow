@@ -90,6 +90,9 @@ public class OrderService {
                 if (productDto == null) {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product " + item.getProductId() + " not found");
                 }
+                if (productDto.getSellerId() == null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Seller ID could not be resolved for product " + item.getProductId());
+                }
 
                 OrderItem orderItem = new OrderItem();
                 orderItem.setProductId(item.getProductId());

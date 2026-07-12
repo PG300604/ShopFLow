@@ -116,7 +116,11 @@ This section describes the MVP multi-vendor support scope.
   * When a seller fetches their orders, they will **only** see the order items belonging to their products.
   * The order total and line items returned will be scoped down to that seller's context (another seller's items are hidden).
 
-### 4. Explicitly Deferred Features (Post-MVP)
+### 4. Database Schema Updates
+* **`order_items` Table / Entity**:
+  * Added **`sellerId`** (UUID, non-nullable): Stores the seller ID of the product, snapshotted from the product catalog at checkout (analogous to how `unitPrice` is snapshotted to preserve historical records, rather than resolved via a live lookup at query time).
+
+### 5. Explicitly Deferred Features (Post-MVP)
 * **Stripe Connect & Payouts**: Stored payouts, seller bank accounts, and automatic marketplace commission splitting.
 * **Seller KYC**: Onboarding verification flow.
 * **Seller Analytics**: Sales dashboards and reporting.

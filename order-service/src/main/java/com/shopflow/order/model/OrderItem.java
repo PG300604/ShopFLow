@@ -21,7 +21,7 @@ public class OrderItem {
     @Column(name = "product_id", nullable = false)
     private UUID productId;
 
-    @Column(name = "seller_id")
+    @Column(name = "seller_id", nullable = false)
     private UUID sellerId;
 
     @Column(nullable = false)
