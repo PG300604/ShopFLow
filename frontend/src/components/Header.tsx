@@ -95,6 +95,25 @@ export const Header = () => {
             </Link>
           )}
 
+          {/* Admin link for easy bypass testing */}
+          {!isAuthenticated && (
+            <Link
+              to="/admin/login"
+              style={{
+                color: 'var(--color-text-muted)',
+                fontSize: '0.8rem',
+                marginRight: '0.5rem',
+                textDecoration: 'none',
+                fontWeight: 500,
+                transition: 'color 0.2s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-active)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-muted)'; }}
+            >
+              Admin
+            </Link>
+          )}
+
           {/* Admin Links */}
           {isAuthenticated && (user?.role === 'ADMIN' || user?.email === 'admin@shopflow.com') && (
             <div style={{ display: 'flex', gap: '1rem', marginRight: '0.5rem' }}>
@@ -181,41 +200,43 @@ export const Header = () => {
             </Link>
           )}
 
-          <button
-            onClick={toggleCart}
-            style={{
-              color: 'var(--color-active)',
-              padding: '0.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              position: 'relative',
-              background: 'none',
-              border: 'none',
-            }}
-            aria-label="Open cart"
-          >
-            <ShoppingBag size={18} strokeWidth={1.5} />
-            {itemCount > 0 && (
-              <span style={{
-                position: 'absolute',
-                top: '0px',
-                right: '0px',
-                backgroundColor: 'var(--color-accent)',
-                color: '#ffffff',
-                fontSize: '0.65rem',
-                fontWeight: 700,
-                borderRadius: '50%',
-                width: '16px',
-                height: '16px',
+          {user?.role !== 'ADMIN' && (
+            <button
+              onClick={toggleCart}
+              style={{
+                color: 'var(--color-active)',
+                padding: '0.5rem',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                lineHeight: 1,
-              }}>
-                {itemCount > 99 ? '99+' : itemCount}
-              </span>
-            )}
-          </button>
+                position: 'relative',
+                background: 'none',
+                border: 'none',
+              }}
+              aria-label="Open cart"
+            >
+              <ShoppingBag size={18} strokeWidth={1.5} />
+              {itemCount > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: '0px',
+                  right: '0px',
+                  backgroundColor: 'var(--color-accent)',
+                  color: '#ffffff',
+                  fontSize: '0.65rem',
+                  fontWeight: 700,
+                  borderRadius: '50%',
+                  width: '16px',
+                  height: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  lineHeight: 1,
+                }}>
+                  {itemCount > 99 ? '99+' : itemCount}
+                </span>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </header>

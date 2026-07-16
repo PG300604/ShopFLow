@@ -25,7 +25,7 @@ if (-not (Test-Path $logDir)) {
 # Start Eureka Server first and wait for it to be healthy
 $eureka = $services[0]
 Write-Host "Starting $($eureka.name)..." -ForegroundColor Yellow
-$eurekaProcess = Start-Process java -ArgumentList "-jar", "d:\ShopFlow\$($eureka.dir)\target\$($eureka.jar)" -RedirectStandardOutput "$logDir\$($eureka.dir).log" -RedirectStandardError "$logDir\$($eureka.dir)-error.log" -PassThru -NoNewWindow
+$eurekaProcess = Start-Process java -ArgumentList "-Djava.net.preferIPv4Stack=true", "-jar", "d:\ShopFlow\$($eureka.dir)\target\$($eureka.jar)" -PassThru -NoNewWindow
 Write-Host "Waiting 12 seconds for Eureka Server to warm up..." -ForegroundColor Gray
 Start-Sleep -Seconds 12
 
@@ -33,7 +33,7 @@ Start-Sleep -Seconds 12
 for ($i = 1; $i -lt $services.Length; $i++) {
     $service = $services[$i]
     Write-Host "Starting $($service.name)..." -ForegroundColor Yellow
-    Start-Process java -ArgumentList "-jar", "d:\ShopFlow\$($service.dir)\target\$($service.jar)" -RedirectStandardOutput "$logDir\$($service.dir).log" -RedirectStandardError "$logDir\$($service.dir)-error.log" -NoNewWindow
+    Start-Process java -ArgumentList "-Djava.net.preferIPv4Stack=true", "-jar", "d:\ShopFlow\$($service.dir)\target\$($service.jar)" -NoNewWindow
     Start-Sleep -Seconds 2 # Stagger start
 }
 
@@ -47,3 +47,8 @@ Write-Host "Eureka Server Dashboard: http://localhost:8761" -ForegroundColor Cya
 Write-Host "Vite React Frontend: http://localhost:5173" -ForegroundColor Cyan
 Write-Host "API Gateway (Base URL): http://localhost:8080" -ForegroundColor Cyan
 Write-Host "=========================================" -ForegroundColor Green
+
+Write-Host "Keeping start services task alive in sandbox group..."
+while ($true) {
+    Start-Sleep -Seconds 10
+}

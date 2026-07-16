@@ -12,7 +12,7 @@ export const LoginPage: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, loginWithGoogle, register } = useAuth();
+  const { login, loginWithGoogle, register, registerSeller } = useAuth();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -52,7 +52,7 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleBypassLogin = async () => {
+  const handleBypassCustomer = async () => {
     setError('');
     setLoading(true);
     const bypassEmail = 'customer@shopflow.com';
@@ -67,7 +67,52 @@ export const LoginPage: React.FC = () => {
         await register(bypassName, bypassEmail, bypassPassword);
         navigate('/');
       } catch (regErr: any) {
-        setError('Bypass failed. Could not register or login.');
+        setError('Customer bypass failed: ' + (regErr?.message || 'Could not register/login'));
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBypassSeller = async () => {
+    setError('');
+    setLoading(true);
+    const bypassEmail = 'seller_bypass@shopflow.com';
+    const bypassPassword = 'password123';
+    const bypassName = 'ShopFlow Seller';
+    const storeName = 'Premium Store';
+
+    try {
+      await login(bypassEmail, bypassPassword);
+      navigate('/seller/dashboard');
+    } catch (err: any) {
+      try {
+        await registerSeller(bypassName, bypassEmail, bypassPassword, storeName);
+        navigate('/seller/dashboard');
+      } catch (regErr: any) {
+        setError('Seller bypass failed: ' + (regErr?.message || 'Could not register/login'));
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBypassAdmin = async () => {
+    setError('');
+    setLoading(true);
+    const bypassEmail = 'admin@shopflow.com';
+    const bypassPassword = 'password123';
+    const bypassName = 'ShopFlow Admin';
+
+    try {
+      await login(bypassEmail, bypassPassword);
+      navigate('/admin/dashboard');
+    } catch (err: any) {
+      try {
+        await register(bypassName, bypassEmail, bypassPassword);
+        navigate('/admin/dashboard');
+      } catch (regErr: any) {
+        setError('Admin bypass failed: ' + (regErr?.message || 'Could not register/login'));
       }
     } finally {
       setLoading(false);
@@ -200,14 +245,14 @@ export const LoginPage: React.FC = () => {
           Continue with Google
         </button>
 
-        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.75rem' }}>
           <button
             type="button"
-            onClick={handleBypassLogin}
+            onClick={handleBypassCustomer}
             disabled={loading}
             className="login-bypass-btn"
             style={{
-              flex: 1,
+              width: '100%',
               padding: '0.65rem 1rem',
               borderRadius: '4px',
               border: '1px dashed var(--color-border)',
@@ -225,10 +270,70 @@ export const LoginPage: React.FC = () => {
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = 'var(--color-border)';
-              e.currentTarget.style.color = 'var(--color-text-muted)';
+              e.currentTarget.style.color = 'var(--text-muted)';
             }}
           >
             Bypass: Customer
+          </button>
+
+          <button
+            type="button"
+            onClick={handleBypassSeller}
+            disabled={loading}
+            className="login-bypass-btn"
+            style={{
+              width: '100%',
+              padding: '0.65rem 1rem',
+              borderRadius: '4px',
+              border: '1px dashed var(--color-border)',
+              backgroundColor: 'transparent',
+              color: 'var(--color-text-muted)',
+              fontSize: '0.8rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              textAlign: 'center'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-active)';
+              e.currentTarget.style.color = 'var(--color-active)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-border)';
+              e.currentTarget.style.color = 'var(--text-muted)';
+            }}
+          >
+            Bypass: Seller
+          </button>
+
+          <button
+            type="button"
+            onClick={handleBypassAdmin}
+            disabled={loading}
+            className="login-bypass-btn"
+            style={{
+              width: '100%',
+              padding: '0.65rem 1rem',
+              borderRadius: '4px',
+              border: '1px dashed var(--color-border)',
+              backgroundColor: 'transparent',
+              color: 'var(--color-text-muted)',
+              fontSize: '0.8rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              textAlign: 'center'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-active)';
+              e.currentTarget.style.color = 'var(--color-active)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-border)';
+              e.currentTarget.style.color = 'var(--text-muted)';
+            }}
+          >
+            Bypass: Admin
           </button>
         </div>
 
