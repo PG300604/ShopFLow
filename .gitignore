@@ -30,6 +30,8 @@ tmp/
 application-local.yml
 *.properties.local
 *.yml.local
+*.local
+*.local.*
 .env
 *.env
 .env.*
