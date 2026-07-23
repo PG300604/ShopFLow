@@ -16,6 +16,11 @@ Write-Host "=========================================" -ForegroundColor Green
 Write-Host "Starting ShopFlow Microservices Platform" -ForegroundColor Green
 Write-Host "=========================================" -ForegroundColor Green
 
+# Set local DB_PASSWORD if not already set
+if (-not $env:DB_PASSWORD) {
+    $env:DB_PASSWORD = "shopflowpgrg"
+}
+
 # Create log directory
 $logDir = "d:\ShopFlow\logs"
 if (-not (Test-Path $logDir)) {
