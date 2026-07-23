@@ -30,6 +30,9 @@ tmp/
 application-local.yml
 *.properties.local
 *.yml.local
+.env
+*.env
+.env.*
 
 # OS Files
 Thumbs.db
