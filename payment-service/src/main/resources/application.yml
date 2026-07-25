@@ -5,9 +5,9 @@ spring:
   application:
     name: payment-service
   datasource:
-    url: jdbc:postgresql://aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres?prepareThreshold=0
-    username: postgres.sclrwsbqxuufptgweemw
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/shopflow}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -25,7 +25,7 @@ eureka:
     prefer-ip-address: true
 
 jwt:
-  secret: 9a4f2c8d3b7a1e5f8g9h0i1j2k3l4m5n6o7p8q9r0s1t2u3v4w5x6y7z8a9b0c1d
+  secret: ${JWT_SECRET:ShopFlowDefaultJwtSecretKeyForDev2026Base64StringLengthMinimum256Bits!}
 
 stripe:
   secret-key: ${STRIPE_SECRET_KEY:YOUR_STRIPE_SECRET_KEY}
