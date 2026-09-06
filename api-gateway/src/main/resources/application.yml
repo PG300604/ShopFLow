@@ -22,37 +22,37 @@ spring:
           enabled: true
       routes:
         - id: auth-service
-          uri: lb://auth-service
+          uri: ${AUTH_SERVICE_URL:lb://auth-service}
           predicates:
             - Path=/api/auth/**
           filters:
             - StripPrefix=1
         - id: product-service
-          uri: lb://product-service
+          uri: ${PRODUCT_SERVICE_URL:lb://product-service}
           predicates:
             - Path=/api/products/**
           filters:
             - StripPrefix=1
         - id: order-service
-          uri: lb://order-service
+          uri: ${ORDER_SERVICE_URL:lb://order-service}
           predicates:
             - Path=/api/orders/**
           filters:
             - StripPrefix=1
         - id: payment-service
-          uri: lb://payment-service
+          uri: ${PAYMENT_SERVICE_URL:lb://payment-service}
           predicates:
             - Path=/api/payments/**
           filters:
             - StripPrefix=1
         - id: notification-service
-          uri: lb://notification-service
+          uri: ${NOTIFICATION_SERVICE_URL:lb://notification-service}
           predicates:
             - Path=/api/notifications/**
           filters:
             - StripPrefix=1
         - id: inventory-service
-          uri: lb://inventory-service
+          uri: ${INVENTORY_SERVICE_URL:lb://inventory-service}
           predicates:
             - Path=/api/inventory/**
           filters:

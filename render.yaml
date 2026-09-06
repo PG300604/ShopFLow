@@ -30,6 +30,42 @@ services:
           name: shopflow-eureka
           property: host
           format: "https://{host}/eureka/"
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: shopflow-auth
+          property: host
+          format: "https://{host}"
+      - key: PRODUCT_SERVICE_URL
+        fromService:
+          type: web
+          name: shopflow-product
+          property: host
+          format: "https://{host}"
+      - key: ORDER_SERVICE_URL
+        fromService:
+          type: web
+          name: shopflow-order
+          property: host
+          format: "https://{host}"
+      - key: INVENTORY_SERVICE_URL
+        fromService:
+          type: web
+          name: shopflow-inventory
+          property: host
+          format: "https://{host}"
+      - key: PAYMENT_SERVICE_URL
+        fromService:
+          type: web
+          name: shopflow-payment
+          property: host
+          format: "https://{host}"
+      - key: NOTIFICATION_SERVICE_URL
+        fromService:
+          type: web
+          name: shopflow-notification
+          property: host
+          format: "https://{host}"
 
   # ─── 3. Auth Service ───
   - type: web
