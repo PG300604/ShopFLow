@@ -41,14 +41,7 @@ services:
     envVars:
       - key: PORT
         value: 8081
-      - key: DB_URL
-        sync: false
-      - key: DB_USERNAME
-        sync: false
-      - key: DB_PASSWORD
-        sync: false
-      - key: JWT_SECRET
-        sync: false
+      - fromGroup: shopflow-shared-env
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
         fromService:
           type: web
@@ -66,14 +59,7 @@ services:
     envVars:
       - key: PORT
         value: 8082
-      - key: DB_URL
-        sync: false
-      - key: DB_USERNAME
-        sync: false
-      - key: DB_PASSWORD
-        sync: false
-      - key: JWT_SECRET
-        sync: false
+      - fromGroup: shopflow-shared-env
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
         fromService:
           type: web
@@ -91,14 +77,7 @@ services:
     envVars:
       - key: PORT
         value: 8083
-      - key: DB_URL
-        sync: false
-      - key: DB_USERNAME
-        sync: false
-      - key: DB_PASSWORD
-        sync: false
-      - key: JWT_SECRET
-        sync: false
+      - fromGroup: shopflow-shared-env
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
         fromService:
           type: web
@@ -116,14 +95,7 @@ services:
     envVars:
       - key: PORT
         value: 8085
-      - key: DB_URL
-        sync: false
-      - key: DB_USERNAME
-        sync: false
-      - key: DB_PASSWORD
-        sync: false
-      - key: JWT_SECRET
-        sync: false
+      - fromGroup: shopflow-shared-env
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
         fromService:
           type: web
@@ -176,3 +148,15 @@ services:
           name: shopflow-eureka
           property: host
           format: "http://{host}:8761/eureka/"
+
+envVarGroups:
+  - name: shopflow-shared-env
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
