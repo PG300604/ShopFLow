@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ApiGatewayApplication {
 
     @org.springframework.context.annotation.Bean
-    public org.springframework.beans.factory.config.BeanFactoryPostProcessor removeWeightCalculatorFilter() {
+    public static org.springframework.beans.factory.config.BeanFactoryPostProcessor removeWeightCalculatorFilter() {
         return beanFactory -> {
             if (beanFactory.containsBeanDefinition("weightCalculatorWebFilter")) {
                 ((org.springframework.beans.factory.support.BeanDefinitionRegistry) beanFactory)
