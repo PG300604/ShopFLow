@@ -2,9 +2,8 @@
 FROM maven:3.9.6-eclipse-temurin-17-alpine AS builder
 WORKDIR /app
 COPY pom.xml .
-COPY common ./common
-COPY inventory-service ./inventory-service
-RUN mvn clean package -DskipTests -pl common,inventory-service
+COPY . .
+RUN mvn clean package -DskipTests -pl common,inventory-service -am
 
 # Stage 2: Runtime
 FROM eclipse-temurin:17-jre-alpine

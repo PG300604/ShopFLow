@@ -2,9 +2,8 @@
 FROM maven:3.9.6-eclipse-temurin-17-alpine AS builder
 WORKDIR /app
 COPY pom.xml .
-COPY common ./common
-COPY api-gateway ./api-gateway
-RUN mvn clean package -DskipTests -pl common,api-gateway
+COPY . .
+RUN mvn clean package -DskipTests -pl common,api-gateway -am
 
 # Stage 2: Runtime
 FROM eclipse-temurin:17-jre-alpine
