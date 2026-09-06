@@ -6,6 +6,9 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      filter:
+        weight-calculator:
+          enabled: false
       globalcors:
         cors-configurations:
           '[/**]':
