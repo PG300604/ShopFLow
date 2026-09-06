@@ -29,7 +29,7 @@ services:
           type: web
           name: shopflow-eureka
           property: host
-          format: "http://{host}:8761/eureka/"
+          format: "https://{host}/eureka/"
 
   # ─── 3. Auth Service ───
   - type: web
@@ -47,7 +47,7 @@ services:
           type: web
           name: shopflow-eureka
           property: host
-          format: "http://{host}:8761/eureka/"
+          format: "https://{host}/eureka/"
 
   # ─── 4. Product Service ───
   - type: web
@@ -65,7 +65,7 @@ services:
           type: web
           name: shopflow-eureka
           property: host
-          format: "http://{host}:8761/eureka/"
+          format: "https://{host}/eureka/"
 
   # ─── 5. Order Service ───
   - type: web
@@ -83,7 +83,7 @@ services:
           type: web
           name: shopflow-eureka
           property: host
-          format: "http://{host}:8761/eureka/"
+          format: "https://{host}/eureka/"
 
   # ─── 6. Inventory Service ───
   - type: web
@@ -101,7 +101,7 @@ services:
           type: web
           name: shopflow-eureka
           property: host
-          format: "http://{host}:8761/eureka/"
+          format: "https://{host}/eureka/"
 
   # ─── 7. Payment Service ───
   - type: web
@@ -122,7 +122,7 @@ services:
           type: web
           name: shopflow-eureka
           property: host
-          format: "http://{host}:8761/eureka/"
+          format: "https://{host}/eureka/"
 
   # ─── 8. Notification Service ───
   - type: web
@@ -147,7 +147,7 @@ services:
           type: web
           name: shopflow-eureka
           property: host
-          format: "http://{host}:8761/eureka/"
+          format: "https://{host}/eureka/"
 
 envVarGroups:
   - name: shopflow-shared-env
