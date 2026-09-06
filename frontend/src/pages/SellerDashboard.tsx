@@ -68,6 +68,7 @@ export const SellerDashboard: React.FC = () => {
   const [prodCategory, setProdCategory] = useState('');
   const [prodImageUrl, setProdImageUrl] = useState('');
   const [prodDesc, setProdDesc] = useState('');
+  const [prodStock, setProdStock] = useState('100');
   const [formError, setFormError] = useState('');
   const [formSubmitting, setFormSubmitting] = useState(false);
 
@@ -117,12 +118,16 @@ export const SellerDashboard: React.FC = () => {
       setProdCategory(product.category);
       setProdImageUrl(product.imageUrl);
       setProdDesc(product.description);
+      api.get<any>(`/inventory/${product.id}`)
+        .then((s) => setProdStock(String(s.physicalQuantity ?? 100)))
+        .catch(() => setProdStock('100'));
     } else {
       setProdName('');
       setProdPrice('');
       setProdCategory('');
       setProdImageUrl('');
       setProdDesc('');
+      setProdStock('100');
     }
     setFormError('');
     setShowProductModal(true);
@@ -147,10 +152,15 @@ export const SellerDashboard: React.FC = () => {
     };
 
     try {
+      let productId: string | undefined = editingProduct?.id;
       if (editingProduct) {
         await api.put(`/products/${editingProduct.id}`, productPayload);
       } else {
-        await api.post('/products', productPayload);
+        const created: any = await api.post('/products', productPayload);
+        productId = created?.id;
+      }
+      if (productId) {
+        await api.put(`/inventory/${productId}`, { quantity: parseInt(prodStock, 10) || 0 }).catch(() => {});
       }
       setShowProductModal(false);
       loadDashboardData();
@@ -547,6 +557,16 @@ export const SellerDashboard: React.FC = () => {
                       required
                       value={prodCategory}
                       onChange={(e) => setProdCategory(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-field">
+                    <label>Stock Quantity</label>
+                    <input
+                      type="number"
+                      min="0"
+                      required
+                      value={prodStock}
+                      onChange={(e) => setProdStock(e.target.value)}
                     />
                   </div>
                 </div>

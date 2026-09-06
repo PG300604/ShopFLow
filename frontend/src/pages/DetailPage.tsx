@@ -29,6 +29,12 @@ interface RatingInfo {
   totalReviews: number;
 }
 
+interface StockInfo {
+  productId: string;
+  isAvailable: boolean;
+  availableStock: number;
+}
+
 function StarRating({
   rating,
   size = 16,
@@ -71,6 +77,7 @@ export const DetailPage: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [ratingInfo, setRatingInfo] = useState<RatingInfo | null>(null);
+  const [stockInfo, setStockInfo] = useState<StockInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -87,14 +94,16 @@ export const DetailPage: React.FC = () => {
     const fetchAll = async () => {
       setLoading(true);
       try {
-        const [productRes, reviewsRes, ratingRes] = await Promise.all([
+        const [productRes, reviewsRes, ratingRes, stockRes] = await Promise.all([
           api.get<Product>(`/products/${id}`),
           api.get<{ content: Review[] }>(`/products/${id}/reviews?page=0&size=10`),
           api.get<RatingInfo>(`/products/${id}/rating`),
+          api.get<StockInfo>(`/inventory/${id}/availability?quantity=1`).catch(() => ({ productId: id, isAvailable: true, availableStock: 100 })),
         ]);
         setProduct(productRes);
         setReviews(reviewsRes.content || []);
         setRatingInfo(ratingRes);
+        setStockInfo(stockRes);
       } catch (err: any) {
         if (err?.response?.status === 404) {
           setNotFound(true);
@@ -207,7 +216,42 @@ export const DetailPage: React.FC = () => {
             ease: [0.25, 0.46, 0.45, 0.94],
           }}
         >
-          <span className="detail-category">{product.category}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <span className="detail-category">{product.category}</span>
+            {stockInfo && (
+              <span
+                style={{
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  padding: '2px 8px',
+                  borderRadius: '9999px',
+                  backgroundColor: !stockInfo.isAvailable || stockInfo.availableStock <= 0
+                    ? 'rgba(239, 68, 68, 0.15)'
+                    : stockInfo.availableStock <= 5
+                    ? 'rgba(245, 158, 11, 0.15)'
+                    : 'rgba(16, 185, 129, 0.15)',
+                  color: !stockInfo.isAvailable || stockInfo.availableStock <= 0
+                    ? '#ef4444'
+                    : stockInfo.availableStock <= 5
+                    ? '#f59e0b'
+                    : '#10b981',
+                  border: `1px solid ${
+                    !stockInfo.isAvailable || stockInfo.availableStock <= 0
+                      ? 'rgba(239, 68, 68, 0.3)'
+                      : stockInfo.availableStock <= 5
+                      ? 'rgba(245, 158, 11, 0.3)'
+                      : 'rgba(16, 185, 129, 0.3)'
+                  }`,
+                }}
+              >
+                {!stockInfo.isAvailable || stockInfo.availableStock <= 0
+                  ? 'Out of Stock'
+                  : stockInfo.availableStock <= 5
+                  ? `Low Stock (Only ${stockInfo.availableStock} left)`
+                  : `In Stock (${stockInfo.availableStock} units)`}
+              </span>
+            )}
+          </div>
           <h1 className="detail-name">{product.name}</h1>
 
           {/* Rating */}
@@ -225,13 +269,26 @@ export const DetailPage: React.FC = () => {
           <p className="detail-description">{product.description}</p>
 
           <div className="detail-actions">
-            <button className="detail-add-btn" onClick={handleAddToCart}>
+            <button
+              className="detail-add-btn"
+              onClick={handleAddToCart}
+              disabled={stockInfo !== null && (!stockInfo.isAvailable || stockInfo.availableStock <= 0)}
+              style={
+                stockInfo !== null && (!stockInfo.isAvailable || stockInfo.availableStock <= 0)
+                  ? { opacity: 0.5, cursor: 'not-allowed' }
+                  : {}
+              }
+            >
               <ShoppingCart size={16} strokeWidth={1.5} />
-              Add to Cart
+              {stockInfo !== null && (!stockInfo.isAvailable || stockInfo.availableStock <= 0)
+                ? 'Out of Stock'
+                : 'Add to Cart'}
             </button>
-            <Link to="/checkout" className="detail-buy-btn">
-              Instant Buy
-            </Link>
+            {(!stockInfo || (stockInfo.isAvailable && stockInfo.availableStock > 0)) && (
+              <Link to="/checkout" className="detail-buy-btn">
+                Instant Buy
+              </Link>
+            )}
             <button className="detail-share-btn" onClick={handleShare}>
               <Share2 size={16} strokeWidth={1.5} />
               Share

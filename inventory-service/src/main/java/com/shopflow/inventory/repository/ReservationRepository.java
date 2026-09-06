@@ -13,4 +13,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
 
     @Query("SELECT COALESCE(SUM(r.quantity), 0) FROM Reservation r WHERE r.productId = :productId AND r.status = 'PENDING'")
     int getPendingReservedQuantity(@Param("productId") UUID productId);
+
+    java.util.List<Reservation> findByOrderId(UUID orderId);
+
+    java.util.List<Reservation> findByProductId(UUID productId);
 }

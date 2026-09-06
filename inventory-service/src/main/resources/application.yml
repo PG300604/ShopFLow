@@ -26,3 +26,6 @@ eureka:
 
 shopflow:
   internal-key: ${SHOPFLOW_INTERNAL_KEY:shopflow-internal-secure-key-2026}
+
+jwt:
+  secret: ${JWT_SECRET:ShopFlowDefaultJwtSecretKeyForDev2026Base64StringLengthMinimum256Bits!}

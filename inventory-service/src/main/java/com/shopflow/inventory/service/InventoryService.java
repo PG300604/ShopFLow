@@ -3,6 +3,7 @@ package com.shopflow.inventory.service;
 import com.shopflow.common.client.inventory.dto.AvailabilityResponse;
 import com.shopflow.common.client.inventory.dto.ReservationResponse;
 import com.shopflow.common.client.inventory.dto.ReserveRequest;
+import com.shopflow.inventory.dto.StockDetailsResponse;
 import com.shopflow.inventory.model.Inventory;
 import com.shopflow.inventory.model.Reservation;
 import com.shopflow.inventory.repository.InventoryRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -25,7 +27,7 @@ public class InventoryService {
         this.reservationRepository = reservationRepository;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public AvailabilityResponse checkAvailability(UUID productId, int quantity) {
         Inventory inventory = inventoryRepository.findById(productId)
                 .orElseGet(() -> inventoryRepository.save(new Inventory(productId, 100)));
@@ -35,6 +37,67 @@ public class InventoryService {
         boolean isAvailable = availableStock >= quantity;
 
         return new AvailabilityResponse(productId, isAvailable, availableStock);
+    }
+
+    @Transactional
+    public StockDetailsResponse getStockDetails(UUID productId) {
+        Inventory inventory = inventoryRepository.findById(productId)
+                .orElseGet(() -> inventoryRepository.save(new Inventory(productId, 100)));
+
+        int pendingReserved = reservationRepository.getPendingReservedQuantity(productId);
+        int availableStock = Math.max(0, inventory.getQuantity() - pendingReserved);
+
+        return new StockDetailsResponse(
+                productId,
+                inventory.getQuantity(),
+                pendingReserved,
+                availableStock,
+                availableStock > 0
+        );
+    }
+
+    @Transactional
+    public StockDetailsResponse updateStock(UUID productId, int newQuantity) {
+        if (newQuantity < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock quantity cannot be negative");
+        }
+
+        Inventory inventory = inventoryRepository.findById(productId)
+                .orElse(new Inventory(productId, 0));
+
+        inventory.setQuantity(newQuantity);
+        inventory = inventoryRepository.save(inventory);
+
+        int pendingReserved = reservationRepository.getPendingReservedQuantity(productId);
+        int availableStock = Math.max(0, inventory.getQuantity() - pendingReserved);
+
+        return new StockDetailsResponse(
+                productId,
+                inventory.getQuantity(),
+                pendingReserved,
+                availableStock,
+                availableStock > 0
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<Reservation> getReservationsByOrderId(UUID orderId) {
+        return reservationRepository.findByOrderId(orderId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StockDetailsResponse> getAllInventory() {
+        return inventoryRepository.findAll().stream().map(inv -> {
+            int pendingReserved = reservationRepository.getPendingReservedQuantity(inv.getProductId());
+            int availableStock = Math.max(0, inv.getQuantity() - pendingReserved);
+            return new StockDetailsResponse(
+                    inv.getProductId(),
+                    inv.getQuantity(),
+                    pendingReserved,
+                    availableStock,
+                    availableStock > 0
+            );
+        }).toList();
     }
 
     @Transactional
