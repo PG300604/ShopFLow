@@ -58,7 +58,7 @@ services:
     region: oregon
     envVars:
       - key: PORT
-        value: 8082
+        value: 8083
       - fromGroup: shopflow-shared-env
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
         fromService:
@@ -76,7 +76,7 @@ services:
     region: oregon
     envVars:
       - key: PORT
-        value: 8083
+        value: 8082
       - fromGroup: shopflow-shared-env
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
         fromService:
