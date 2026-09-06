@@ -24,12 +24,6 @@ services:
     envVars:
       - key: PORT
         value: 8080
-      - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-        fromService:
-          type: web
-          name: shopflow-eureka
-          property: host
-          format: "https://{host}/eureka/"
       - key: AUTH_SERVICE_URL
         fromService:
           type: web
