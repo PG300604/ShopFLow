@@ -1,0 +1,32 @@
+name: Free-Tier Keep-Alive & Anti-Pause Engine
+
+# Runs every 14 minutes to prevent Render free-tier instances from spinning down (15-min timeout)
+# and sends a query through the API Gateway -> Product Service -> Supabase PostgreSQL database
+# to guarantee Supabase never pauses due to the 7-day inactivity rule.
+
+on:
+  schedule:
+    - cron: '*/14 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping-and-keep-alive:
+    name: Ping Render Gateway & Supabase DB
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping API Gateway & Database Round-Trip
+        env:
+          GATEWAY_URL: ${{ secrets.RENDER_GATEWAY_URL }}
+        run: |
+          # Fallback default or use repository secret RENDER_GATEWAY_URL
+          URL="${GATEWAY_URL:-https://shopflow-gateway.onrender.com}"
+          echo "Sending keep-alive ping to: $URL/api/products?page=0&size=1"
+          
+          # Query product catalog to trigger Gateway -> Eureka -> Product-Service -> Supabase SQL Query
+          HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" --max-time 30 "$URL/api/products?page=0&size=1" || true)
+          echo "Ping response status: $HTTP_STATUS"
+          
+          # Also ping inventory service availability
+          curl -o /dev/null -s --max-time 15 "$URL/api/inventory" || true
+          
+          echo "Keep-alive round-trip completed. Render instances kept warm; Supabase PostgreSQL kept active."

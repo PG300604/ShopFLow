@@ -1,0 +1,190 @@
+version: '3.8'
+
+services:
+  # ─── Local Database (Fallback / Local Testing) ───
+  postgres:
+    image: postgres:16-alpine
+    container_name: shopflow-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-shopflow}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shopflow-net
+
+  # ─── Eureka Service Registry ───
+  eureka-server:
+    build:
+      context: .
+      dockerfile: eureka-server/Dockerfile
+    container_name: shopflow-eureka
+    ports:
+      - "8761:8761"
+    environment:
+      SERVER_PORT: 8761
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
+      EUREKA_CLIENT_FETCH_REGISTRY: "false"
+    networks:
+      - shopflow-net
+
+  # ─── Spring Cloud API Gateway ───
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: shopflow-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+    networks:
+      - shopflow-net
+
+  # ─── Auth Service ───
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    container_name: shopflow-auth
+    ports:
+      - "8081:8081"
+    environment:
+      SERVER_PORT: 8081
+      DB_URL: ${DB_URL:-jdbc:postgresql://postgres:5432/shopflow}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET:-ShopFlowDefaultJwtSecretKeyForDev2026Base64StringLengthMinimum256Bits!}
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    networks:
+      - shopflow-net
+
+  # ─── Product Service ───
+  product-service:
+    build:
+      context: .
+      dockerfile: product-service/Dockerfile
+    container_name: shopflow-product
+    ports:
+      - "8082:8082"
+    environment:
+      SERVER_PORT: 8082
+      DB_URL: ${DB_URL:-jdbc:postgresql://postgres:5432/shopflow}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET:-ShopFlowDefaultJwtSecretKeyForDev2026Base64StringLengthMinimum256Bits!}
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    networks:
+      - shopflow-net
+
+  # ─── Order Service ───
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    container_name: shopflow-order
+    ports:
+      - "8083:8083"
+    environment:
+      SERVER_PORT: 8083
+      DB_URL: ${DB_URL:-jdbc:postgresql://postgres:5432/shopflow}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET:-ShopFlowDefaultJwtSecretKeyForDev2026Base64StringLengthMinimum256Bits!}
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    networks:
+      - shopflow-net
+
+  # ─── Payment Service ───
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    container_name: shopflow-payment
+    ports:
+      - "8084:8084"
+    environment:
+      SERVER_PORT: 8084
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-sk_test_dummy}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_dummy}
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+    networks:
+      - shopflow-net
+
+  # ─── Inventory Service ───
+  inventory-service:
+    build:
+      context: .
+      dockerfile: inventory-service/Dockerfile
+    container_name: shopflow-inventory
+    ports:
+      - "8085:8085"
+    environment:
+      SERVER_PORT: 8085
+      DB_URL: ${DB_URL:-jdbc:postgresql://postgres:5432/shopflow}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET:-ShopFlowDefaultJwtSecretKeyForDev2026Base64StringLengthMinimum256Bits!}
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    networks:
+      - shopflow-net
+
+  # ─── Notification Service ───
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    container_name: shopflow-notification
+    ports:
+      - "8086:8086"
+    environment:
+      SERVER_PORT: 8086
+      SPRING_MAIL_HOST: ${MAIL_HOST:-sandbox.smtp.mailtrap.io}
+      SPRING_MAIL_PORT: ${MAIL_PORT:-2525}
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME:-dummy}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD:-dummy}
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+    networks:
+      - shopflow-net
+
+volumes:
+  postgres_data:
+
+networks:
+  shopflow-net:
+    driver: bridge
