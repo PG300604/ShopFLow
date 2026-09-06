@@ -19,40 +19,40 @@ spring:
             allowedHeaders: "*"
       discovery:
         locator:
-          enabled: true
+          enabled: false
       routes:
         - id: auth-service
-          uri: ${AUTH_SERVICE_URL:lb://auth-service}
+          uri: ${AUTH_SERVICE_URL:http://localhost:8081}
           predicates:
             - Path=/api/auth/**
           filters:
             - StripPrefix=1
         - id: product-service
-          uri: ${PRODUCT_SERVICE_URL:lb://product-service}
+          uri: ${PRODUCT_SERVICE_URL:http://localhost:8083}
           predicates:
             - Path=/api/products/**
           filters:
             - StripPrefix=1
         - id: order-service
-          uri: ${ORDER_SERVICE_URL:lb://order-service}
+          uri: ${ORDER_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/orders/**
           filters:
             - StripPrefix=1
         - id: payment-service
-          uri: ${PAYMENT_SERVICE_URL:lb://payment-service}
+          uri: ${PAYMENT_SERVICE_URL:http://localhost:8084}
           predicates:
             - Path=/api/payments/**
           filters:
             - StripPrefix=1
         - id: notification-service
-          uri: ${NOTIFICATION_SERVICE_URL:lb://notification-service}
+          uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8086}
           predicates:
             - Path=/api/notifications/**
           filters:
             - StripPrefix=1
         - id: inventory-service
-          uri: ${INVENTORY_SERVICE_URL:lb://inventory-service}
+          uri: ${INVENTORY_SERVICE_URL:http://localhost:8085}
           predicates:
             - Path=/api/inventory/**
           filters:
@@ -60,7 +60,4 @@ spring:
 
 eureka:
   client:
-    service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka/}
-  instance:
-    prefer-ip-address: true
+    enabled: false
