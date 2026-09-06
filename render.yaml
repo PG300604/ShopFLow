@@ -32,7 +32,7 @@ services:
           format: "http://{host}:8761/eureka/"
 
   # ─── 3. Auth Service ───
-  - type: pserv
+  - type: web
     name: shopflow-auth
     env: docker
     dockerfilePath: auth-service/Dockerfile
@@ -50,7 +50,7 @@ services:
           format: "http://{host}:8761/eureka/"
 
   # ─── 4. Product Service ───
-  - type: pserv
+  - type: web
     name: shopflow-product
     env: docker
     dockerfilePath: product-service/Dockerfile
@@ -68,7 +68,7 @@ services:
           format: "http://{host}:8761/eureka/"
 
   # ─── 5. Order Service ───
-  - type: pserv
+  - type: web
     name: shopflow-order
     env: docker
     dockerfilePath: order-service/Dockerfile
@@ -86,7 +86,7 @@ services:
           format: "http://{host}:8761/eureka/"
 
   # ─── 6. Inventory Service ───
-  - type: pserv
+  - type: web
     name: shopflow-inventory
     env: docker
     dockerfilePath: inventory-service/Dockerfile
@@ -104,7 +104,7 @@ services:
           format: "http://{host}:8761/eureka/"
 
   # ─── 7. Payment Service ───
-  - type: pserv
+  - type: web
     name: shopflow-payment
     env: docker
     dockerfilePath: payment-service/Dockerfile
@@ -125,7 +125,7 @@ services:
           format: "http://{host}:8761/eureka/"
 
   # ─── 8. Notification Service ───
-  - type: pserv
+  - type: web
     name: shopflow-notification
     env: docker
     dockerfilePath: notification-service/Dockerfile
