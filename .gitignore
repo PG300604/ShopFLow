@@ -48,6 +48,7 @@ Desktop.ini
 .claude/
 graphify-out/
 .maven/
+docs/mermaid.min.js
 .m2/
 
 # Test Outputs

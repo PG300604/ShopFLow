@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShopFlow — System Architecture & Technical Documentation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    @page {
+      size: A4 portrait;
+      margin: 14mm 14mm 14mm 14mm;
+    }
+
+    @page :first {
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #0f172a;
+      background: #ffffff;
+      line-height: 1.5;
+      font-size: 9.5pt;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+
+    /* ── Cover Page (Single Crisp Page) ────────── */
+    .cover-page {
+      width: 100%;
+      height: 297mm;
+      padding: 38mm 24mm 28mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: linear-gradient(135deg, #090d16 0%, #111827 60%, #030712 100%);
+      color: #f8fafc;
+      page-break-after: always;
+      break-after: page;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover-page::before {
+      content: "";
+      position: absolute;
+      top: -80px;
+      right: -80px;
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .cover-page::after {
+      content: "";
+      position: absolute;
+      bottom: -100px;
+      left: -80px;
+      width: 460px;
+      height: 460px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .cover-top {
+      position: relative;
+      z-index: 2;
+    }
+
+    .cover-badge-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .badge-solo {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 14px;
+      border-radius: 20px;
+      background: rgba(168, 85, 247, 0.2);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #d8b4fe;
+      font-size: 8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .badge-version {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 14px;
+      border-radius: 20px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #7dd3fc;
+      font-size: 8pt;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .cover-title {
+      font-size: 38pt;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .cover-subtitle {
+      font-size: 15pt;
+      font-weight: 500;
+      color: #94a3b8;
+      max-width: 580px;
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
+
+    .cover-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      max-width: 580px;
+    }
+
+    .cover-tag {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 8pt;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .cover-footer {
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .cover-author-title {
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .cover-author-name {
+      font-size: 15pt;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .cover-author-role {
+      font-size: 8.5pt;
+      color: #38bdf8;
+      font-weight: 500;
+    }
+
+    .cover-meta {
+      text-align: right;
+      font-size: 8pt;
+      color: #94a3b8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Content Layout ────────────────────────── */
+    .document-body {
+      padding: 4px 0;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid #0f172a;
+      padding-bottom: 6px;
+      margin-bottom: 16px;
+    }
+
+    .header-bar__title {
+      font-size: 8.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #475569;
+    }
+
+    .header-bar__meta {
+      font-size: 8pt;
+      color: #64748b;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    h2 {
+      font-size: 14pt;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 5px;
+      margin-top: 14px;
+      margin-bottom: 10px;
+      color: #0f172a;
+    }
+
+    h3 {
+      font-size: 11pt;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      color: #1e293b;
+    }
+
+    p {
+      margin-bottom: 8px;
+      color: #334155;
+      font-size: 9pt;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 16px;
+      font-size: 8pt;
+    }
+
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 5px 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .diagram-container {
+      margin: 10px 0 14px;
+      padding: 12px;
+      background: #fafafa;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      text-align: center;
+      overflow: hidden;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .diagram-title {
+      font-size: 8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #475569;
+      margin-bottom: 8px;
+      text-align: left;
+    }
+
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .mermaid svg {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+
+    .callout {
+      border-left: 4px solid #3b82f6;
+      background: #eff6ff;
+      padding: 8px 12px;
+      border-radius: 0 6px 6px 0;
+      margin: 10px 0;
+      font-size: 8pt;
+      color: #1e3a8a;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .card {
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 8px 10px;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .card__title {
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 3px;
+    }
+
+    .card__desc {
+      font-size: 7.8pt;
+      color: #64748b;
+      line-height: 1.35;
+      margin: 0;
+    }
+  </style>
+  <script src="./mermaid.min.js"></script>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- PAGE 1: COVER                                            -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div class="cover-page">
+    <div class="cover-top">
+      <div class="cover-badge-bar">
+        <span class="badge-solo">Solo Full-Stack Project</span>
+        <span class="badge-version">v1.0.0-RELEASE</span>
+      </div>
+      <h1 class="cover-title">ShopFlow</h1>
+      <p class="cover-subtitle">
+        Enterprise-Grade Distributed Multi-Vendor E-Commerce Platform
+      </p>
+      <div class="cover-tags">
+        <span class="cover-tag">Java 17 LTS</span>
+        <span class="cover-tag">Spring Boot 3.3.1</span>
+        <span class="cover-tag">Spring Cloud 2023</span>
+        <span class="cover-tag">Netflix Eureka</span>
+        <span class="cover-tag">Spring Cloud Gateway</span>
+        <span class="cover-tag">PostgreSQL 16</span>
+        <span class="cover-tag">Two-Phase Stock Lock</span>
+        <span class="cover-tag">Stripe Card & UPI</span>
+        <span class="cover-tag">React 18 / TypeScript</span>
+        <span class="cover-tag">Pinterest Editorial UI</span>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <div>
+        <div class="cover-author-title">Architected & Engineered By</div>
+        <div class="cover-author-name">Priyanshu Ghosh</div>
+        <div class="cover-author-role">Full-Stack Software Engineer · @PG300604</div>
+      </div>
+      <div class="cover-meta">
+        <div>Architecture Whitepaper</div>
+        <div>September 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- PAGE 2: EXECUTIVE SUMMARY & TOPOLOGY                     -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div class="document-body">
+    <div class="header-bar">
+      <span class="header-bar__title">ShopFlow — Architecture Whitepaper</span>
+      <span class="header-bar__meta">Author: Priyanshu Ghosh</span>
+    </div>
+
+    <h2>1. Executive Summary & Architecture Tenets</h2>
+    <p>
+      ShopFlow is an enterprise-grade multi-vendor e-commerce platform designed and built from scratch as an end-to-end solo initiative. The platform simulates high-throughput real-world commerce workloads across distributed, autonomous services while maintaining strict data consistency, transactional safety, and low-latency client experiences.
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card__title">Two-Phase Inventory Lock</div>
+        <p class="card__desc">
+          Concurrency-safe reservation locks (PENDING &rarr; COMMITTED / RELEASED) prevent overselling during checkout spikes.
+        </p>
+      </div>
+      <div class="card">
+        <div class="card__title">Stripe Webhooks & Fallback</div>
+        <p class="card__desc">
+          HMAC-verified webhooks decouple payment authorization from synchronous client requests, backed by client-side fallback order generators.
+        </p>
+      </div>
+      <div class="card">
+        <div class="card__title">Multi-Vendor Partitioning</div>
+        <p class="card__desc">
+          Strict role-based isolation ensures vendors manage independent catalog inventories and query scoped fulfillment pipelines.
+        </p>
+      </div>
+      <div class="card">
+        <div class="card__title">Pinterest Editorial UI</div>
+        <p class="card__desc">
+          Zero-dependency React 18 + TypeScript frontend with 3-column editorial grid, live swatches, size filters, and full INR (₹) localization.
+        </p>
+      </div>
+    </div>
+
+    <h2>2. High-Level System Mesh & Edge Topology</h2>
+    <div class="diagram-container">
+      <div class="diagram-title">System Architecture Mesh</div>
+      <div class="mermaid">
+flowchart TD
+    subgraph ClientTier["Client Layer"]
+        Browser["React 18 SPA (Vite / TypeScript)<br/>Pure CSS Minimalist UI"]
+    end
+
+    subgraph EdgeTier["Edge & Discovery Layer"]
+        Gateway["Spring Cloud API Gateway (:8080)<br/>Route Dispatch · CORS · JWT Verification"]
+        Eureka["Netflix Eureka Server (:8761)<br/>Service Registry & Heartbeat Health Monitor"]
+    end
+
+    subgraph DomainMesh["Domain Microservices Mesh"]
+        AuthSvc["auth-service (:8081)<br/>JJWT 0.12.5 · BCrypt · User RBAC"]
+        ProductSvc["product-service (:8082)<br/>Catalog · Reviews · Vendor Partitioning"]
+        OrderSvc["order-service (:8083)<br/>Cart Sync · State Machine · Sweeper"]
+        PaymentSvc["payment-service (:8084)<br/>Stripe SDK · Webhooks Listener"]
+        InventorySvc["inventory-service (:8085)<br/>Two-Phase Stock Lock · Reservation Engine"]
+        NotificationSvc["notification-service (:8086)<br/>Async Mailer · Email Templates"]
+    end
+
+    subgraph DataTier["Distributed Persistence Layer"]
+        DB_Auth[("PostgreSQL: auth_db")]
+        DB_Prod[("PostgreSQL: product_db")]
+        DB_Order[("PostgreSQL: order_db")]
+        DB_Inv[("PostgreSQL: inventory_db")]
+    end
+
+    Browser -->|"HTTP / HTTPS (Bearer JWT)"| Gateway
+    Gateway -.-> Eureka
+    DomainMesh -.-> Eureka
+
+    Gateway --> AuthSvc
+    Gateway --> ProductSvc
+    Gateway --> OrderSvc
+    Gateway --> PaymentSvc
+    Gateway --> InventorySvc
+    Gateway --> NotificationSvc
+
+    OrderSvc -->|"OpenFeign"| InventorySvc
+    OrderSvc -->|"OpenFeign"| ProductSvc
+    OrderSvc -->|"OpenFeign"| NotificationSvc
+    PaymentSvc -->|"OpenFeign"| OrderSvc
+
+    AuthSvc --> DB_Auth
+    ProductSvc --> DB_Prod
+    OrderSvc --> DB_Order
+    InventorySvc --> DB_Inv
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- PAGE 3: DATA FLOW DIAGRAMS                               -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div class="document-body">
+    <div class="header-bar">
+      <span class="header-bar__title">ShopFlow — Architecture Whitepaper</span>
+      <span class="header-bar__meta">Author: Priyanshu Ghosh</span>
+    </div>
+
+    <h2>3. Data Flow Diagrams (DFDs)</h2>
+
+    <h3>3.1 DFD Level 0 — Context Diagram</h3>
+    <div class="diagram-container">
+      <div class="diagram-title">Level 0 Context Boundary</div>
+      <div class="mermaid">
+flowchart LR
+    Shopper["Shopper / Customer"]
+    Vendor["Store Seller"]
+    Admin["System Administrator"]
+    Stripe["Stripe Gateway"]
+    SMTP["SMTP Mail Server"]
+
+    SystemBoundary["ShopFlow Commerce Platform"]
+
+    Shopper -->|"Browse, Cart, Order Checkout"| SystemBoundary
+    SystemBoundary -->|"Catalogs, Confirmation Code"| Shopper
+
+    Vendor -->|"Create Products, Restock Stock"| SystemBoundary
+    SystemBoundary -->|"Scoped Analytics, Vendor Orders"| Vendor
+
+    Admin -->|"Approve Ads, Platform Metrics"| SystemBoundary
+    SystemBoundary -->|"Global Orders, Diagnostics"| Admin
+
+    SystemBoundary -->|"PaymentIntent Creation"| Stripe
+    Stripe -->|"HMAC Webhook Callback"| SystemBoundary
+
+    SystemBoundary -->|"Async Order Confirmation Mail"| SMTP
+      </div>
+    </div>
+
+    <h3>3.2 DFD Level 1 — Core Subsystems Breakdown</h3>
+    <div class="diagram-container">
+      <div class="diagram-title">Level 1 Subsystems & Data Stores</div>
+      <div class="mermaid">
+flowchart TD
+    Customer["Customer"]
+    Seller["Seller"]
+    StripeActor["Stripe"]
+
+    P1["1.0 Auth & User Management"]
+    P2["2.0 Catalog & Content Service"]
+    P3["3.0 Inventory & Lock Service"]
+    P4["4.0 Order Lifecycle Service"]
+    P5["5.0 Payment & Webhooks"]
+    P6["6.0 Notification Dispatcher"]
+
+    D1[("D1: Users & Credentials")]
+    D2[("D2: Catalog & Categories")]
+    D3[("D3: Stock & Reservations")]
+    D4[("D4: Orders & Cart Sync")]
+
+    Customer -->|"Credentials"| P1
+    P1 <-->|"Verify & Store"| D1
+
+    Seller -->|"Product Specs & Restock"| P2
+    P2 <-->|"Catalog Storage"| D2
+
+    Customer -->|"Checkout Cart"| P4
+    P4 <-->|"Order Items"| D4
+    P4 -->|"Reserve Stock Query"| P3
+    P3 <-->|"Update Locks"| D3
+
+    P4 -->|"Init Intent"| P5
+    P5 <-->|"Intent & Secret"| StripeActor
+    StripeActor -->|"Webhook: charge.succeeded"| P5
+    P5 -->|"Confirm Order"| P4
+    P4 -->|"Commit Reservation"| P3
+    P4 -->|"Trigger Confirmation"| P6
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- PAGE 4: CHECKOUT SEQUENCE (DFD LEVEL 2)                  -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div class="document-body">
+    <div class="header-bar">
+      <span class="header-bar__title">ShopFlow — Architecture Whitepaper</span>
+      <span class="header-bar__meta">Author: Priyanshu Ghosh</span>
+    </div>
+
+    <h2>4. End-to-End Checkout & Two-Phase Lock Sequence (DFD Level 2)</h2>
+    <p>
+      The sequence below details the transactional coordination between the shopper, gateway, order service, inventory reservation locks, Stripe webhook dispatch, and final notification commit.
+    </p>
+
+    <div class="diagram-container">
+      <div class="diagram-title">Level 2 Sequence Flow</div>
+      <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Shopper as Customer (Browser)
+    participant GW as API Gateway (:8080)
+    participant Ord as Order Service (:8083)
+    participant Inv as Inventory Service (:8085)
+    participant Pay as Payment Service (:8084)
+    participant Str as Stripe Gateway
+    participant Notif as Notification Service (:8086)
+
+    Shopper->>GW: POST /api/orders/checkout (JWT + Cart Items)
+    GW->>Ord: Forward Checkout Request
+    
+    critical Phase 1: Stock Reservation
+        Ord->>Inv: POST /inventory/reserve (productId, quantity, holdDuration=15m)
+        alt Stock Available (physical - pending >= qty)
+            Inv-->>Ord: 200 OK (ReservationId, Status=PENDING)
+        else Insufficient Stock
+            Inv-->>Ord: 409 Conflict ("Out of stock")
+            Ord-->>Shopper: 409 Conflict (Prompt user to adjust cart)
+        end
+    end
+
+    Ord->>Ord: Create Order (Status=PENDING, ReferenceCode=#SF-XXXXXX)
+    Ord->>Pay: POST /api/payments/create-intent (orderId, amount, currency=INR)
+    Pay->>Str: Create Stripe PaymentIntent
+    Str-->>Pay: Return clientSecret
+    Pay-->>Ord: Payment Intent Metadata
+    Ord-->>Shopper: Checkout Session Initiated (clientSecret, orderId)
+
+    Shopper->>Shopper: Display Stripe Payment Modal (Card / UPI)
+    Shopper->>Str: Confirm Card / UPI Authorization
+
+    alt Payment Succeeded
+        Str->>Pay: POST /api/payments/webhook (HMAC Signature + charge.succeeded)
+        Pay->>Pay: Verify Cryptographic Signature
+        Pay->>Ord: PUT /api/orders/{id}/status (Status=PAID)
+        critical Phase 2: Stock Commit
+            Ord->>Inv: POST /inventory/commit (reservationId)
+            Inv-->>Ord: 200 OK (Status=COMMITTED, Physical Stock Deducted)
+        end
+        Ord->>Notif: POST /api/notifications/send (orderSummary)
+        Notif-->>Shopper: Dispatch Order Confirmation Email
+    else Payment Abandoned or Timed Out (> 15 minutes)
+        Note over Inv: Background Sweeper triggers every 60s
+        Inv->>Inv: Auto-Release Orphaned Reservations (Status=RELEASED)
+    end
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- PAGE 5: DATABASE ERD                                     -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div class="document-body">
+    <div class="header-bar">
+      <span class="header-bar__title">ShopFlow — Architecture Whitepaper</span>
+      <span class="header-bar__meta">Author: Priyanshu Ghosh</span>
+    </div>
+
+    <h2>5. Database Entity-Relationship Model (ERD)</h2>
+    <p>
+      Each microservice owns an independent database schema. Cross-service relationships are maintained through immutable identifier snapshotting.
+    </p>
+
+    <div class="diagram-container">
+      <div class="diagram-title">Cross-Service Relational Schemas</div>
+      <div class="mermaid">
+erDiagram
+    USER {
+        bigint id PK
+        varchar email UK
+        varchar password_hash
+        varchar full_name
+        varchar role
+    }
+
+    PRODUCT {
+        bigint id PK
+        varchar name
+        numeric price
+        varchar category
+        varchar image_url
+        bigint seller_id FK
+    }
+
+    ORDER_ENTITY {
+        bigint id PK
+        bigint user_id FK
+        varchar reference_code UK
+        numeric total_amount
+        varchar status
+    }
+
+    ORDER_ITEM {
+        bigint id PK
+        bigint order_id FK
+        bigint product_id
+        int quantity
+        numeric unit_price
+    }
+
+    INVENTORY {
+        bigint id PK
+        bigint product_id UK
+        int physical_stock
+        int reserved_stock
+    }
+
+    STOCK_RESERVATION {
+        bigint id PK
+        bigint product_id FK
+        varchar status
+        timestamp expires_at
+    }
+
+    USER ||--o{ ORDER_ENTITY : places
+    PRODUCT ||--o{ ORDER_ITEM : snapshot
+    ORDER_ENTITY ||--|{ ORDER_ITEM : contains
+    INVENTORY ||--o{ STOCK_RESERVATION : reserves
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- PAGE 6: STATE MACHINES & RBAC                            -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div class="document-body">
+    <div class="header-bar">
+      <span class="header-bar__title">ShopFlow — Architecture Whitepaper</span>
+      <span class="header-bar__meta">Author: Priyanshu Ghosh</span>
+    </div>
+
+    <h2>6. Finite State Machines</h2>
+    <div class="grid-2">
+      <div class="diagram-container">
+        <div class="diagram-title">Order Lifecycle States</div>
+        <div class="mermaid">
+stateDiagram-v2
+    [*] --> PENDING
+    PENDING --> PAID
+    PENDING --> CANCELLED
+    PAID --> SHIPPED
+    SHIPPED --> DELIVERED
+    PAID --> REFUNDED
+    DELIVERED --> [*]
+    CANCELLED --> [*]
+    REFUNDED --> [*]
+        </div>
+      </div>
+      <div class="diagram-container">
+        <div class="diagram-title">Two-Phase Stock Lock States</div>
+        <div class="mermaid">
+stateDiagram-v2
+    [*] --> AVAILABLE
+    AVAILABLE --> PENDING_RESERVED
+    PENDING_RESERVED --> COMMITTED
+    PENDING_RESERVED --> RELEASED
+    RELEASED --> AVAILABLE
+    COMMITTED --> [*]
+        </div>
+      </div>
+    </div>
+
+    <h2>7. Role-Based Access Control (RBAC) Matrix</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Endpoint Pattern</th>
+          <th>Anonymous</th>
+          <th>CUSTOMER</th>
+          <th>SELLER</th>
+          <th>ADMIN</th>
+          <th>Enforced Access Scope</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="font-mono">POST /api/auth/**</td>
+          <td>Allowed</td>
+          <td>Allowed</td>
+          <td>Allowed</td>
+          <td>Allowed</td>
+          <td>Public credentials & JWT issuance</td>
+        </tr>
+        <tr>
+          <td class="font-mono">GET /api/products/**</td>
+          <td>Allowed</td>
+          <td>Allowed</td>
+          <td>Allowed</td>
+          <td>Allowed</td>
+          <td>Public catalog browsing & details</td>
+        </tr>
+        <tr>
+          <td class="font-mono">POST /api/products</td>
+          <td>Denied</td>
+          <td>Denied</td>
+          <td>Allowed</td>
+          <td>Allowed</td>
+          <td>Vendor product registration</td>
+        </tr>
+        <tr>
+          <td class="font-mono">POST /api/orders/checkout</td>
+          <td>Denied</td>
+          <td>Allowed</td>
+          <td>Allowed</td>
+          <td>Allowed</td>
+          <td>Two-phase inventory lock & order creation</td>
+        </tr>
+        <tr>
+          <td class="font-mono">GET /api/orders/seller/mine</td>
+          <td>Denied</td>
+          <td>Denied</td>
+          <td>Allowed</td>
+          <td>Allowed</td>
+          <td>Orders filtered strictly to vendor products</td>
+        </tr>
+        <tr>
+          <td class="font-mono">PUT /api/orders/{id}/admin-status</td>
+          <td>Denied</td>
+          <td>Denied</td>
+          <td>Denied</td>
+          <td>Allowed</td>
+          <td>Super-user fulfillment override</td>
+        </tr>
+        <tr>
+          <td class="font-mono">POST /api/payments/webhook</td>
+          <td>Stripe</td>
+          <td>Stripe</td>
+          <td>Stripe</td>
+          <td>Stripe</td>
+          <td>Cryptographic HMAC signature validation</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- PAGE 7: REGISTRY & RESILIENCE RUNBOOK                    -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div class="document-body">
+    <div class="header-bar">
+      <span class="header-bar__title">ShopFlow — Architecture Whitepaper</span>
+      <span class="header-bar__meta">Author: Priyanshu Ghosh</span>
+    </div>
+
+    <h2>8. Microservices Registry & Port Registry</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Service Name</th>
+          <th>Port</th>
+          <th>Base Path</th>
+          <th>Primary Responsibility</th>
+          <th>Persistence Layer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>api-gateway</strong></td>
+          <td class="font-mono">8080</td>
+          <td class="font-mono">/</td>
+          <td>Edge routing, CORS dispatch, JWT header forwarding</td>
+          <td>Stateless</td>
+        </tr>
+        <tr>
+          <td><strong>eureka-server</strong></td>
+          <td class="font-mono">8761</td>
+          <td class="font-mono">/</td>
+          <td>Service discovery registry, dynamic heartbeat pulse</td>
+          <td>In-Memory Mesh</td>
+        </tr>
+        <tr>
+          <td><strong>auth-service</strong></td>
+          <td class="font-mono">8081</td>
+          <td class="font-mono">/api/auth</td>
+          <td>User account lifecycle, BCrypt, JJWT claims issuance</td>
+          <td>PostgreSQL (auth_db)</td>
+        </tr>
+        <tr>
+          <td><strong>product-service</strong></td>
+          <td class="font-mono">8082</td>
+          <td class="font-mono">/api/products</td>
+          <td>Multi-vendor catalog, category indexing, reviews</td>
+          <td>PostgreSQL (product_db)</td>
+        </tr>
+        <tr>
+          <td><strong>order-service</strong></td>
+          <td class="font-mono">8083</td>
+          <td class="font-mono">/api/orders</td>
+          <td>Checkout orchestration, state machine, cart sync</td>
+          <td>PostgreSQL (order_db)</td>
+        </tr>
+        <tr>
+          <td><strong>payment-service</strong></td>
+          <td class="font-mono">8084</td>
+          <td class="font-mono">/api/payments</td>
+          <td>Stripe PaymentIntent generation, webhook listener</td>
+          <td>Stateless (Feign to Orders)</td>
+        </tr>
+        <tr>
+          <td><strong>inventory-service</strong></td>
+          <td class="font-mono">8085</td>
+          <td class="font-mono">/inventory</td>
+          <td>Two-phase reservation locks, 15m auto-sweeper</td>
+          <td>PostgreSQL (inventory_db)</td>
+        </tr>
+        <tr>
+          <td><strong>notification-service</strong></td>
+          <td class="font-mono">8086</td>
+          <td class="font-mono">/api/notifications</td>
+          <td>Async HTML order confirmation via SMTP relay</td>
+          <td>Stateless</td>
+        </tr>
+        <tr>
+          <td><strong>frontend</strong></td>
+          <td class="font-mono">5173</td>
+          <td class="font-mono">/</td>
+          <td>React 18 + Vite storefront with Pinterest grid & INR</td>
+          <td>LocalStorage / Session</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>9. Failure Modes & Resilience Patterns</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card__title">Graceful Fallback Checkout</div>
+        <p class="card__desc">
+          Decoupled modal with resilient client-side order reference generation prevents users from getting stranded during downstream hiccups.
+        </p>
+      </div>
+      <div class="card">
+        <div class="card__title">Orphaned Lock Auto-Sweeper</div>
+        <p class="card__desc">
+          Scheduled 60-second background worker automatically sweeps abandoned PENDING stock reservations past 15 minutes.
+        </p>
+      </div>
+      <div class="card">
+        <div class="card__title">Spring Security /error Permitted</div>
+        <p class="card__desc">
+          All microservices explicitly permit /error in SecurityFilterChain to ensure domain status exceptions (409, 400) dispatch properly.
+        </p>
+      </div>
+      <div class="card">
+        <div class="card__title">Stateless Mesh Load Balancing</div>
+        <p class="card__desc">
+          Netflix Eureka dynamic registry paired with OpenFeign client-side load balancing provides transparent routing without hardcoded IPs.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top: 14px;">
+      <strong>Engineering Summary:</strong> ShopFlow demonstrates complete full-stack mastery across distributed transaction coordination, database schema isolation, zero-framework CSS design, and asynchronous webhook pipelines, architected and built solo by <strong>Priyanshu Ghosh</strong>.
+    </div>
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'neutral',
+      securityLevel: 'loose',
+      fontFamily: 'Plus Jakarta Sans',
+      fontSize: 10,
+      flowchart: { curve: 'basis', htmlLabels: false },
+      sequence: { mirrorActors: false, actorFontSize: 10, messageFontSize: 9 }
+    });
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        await mermaid.run();
+        console.log("Mermaid rendering complete");
+      } catch (err) {
+        console.error("Mermaid error:", err);
+      } finally {
+        window.DOC_READY = true;
+      }
+    });
+  </script>
+</body>
+</html>
