@@ -23,6 +23,8 @@
 
 ## 📑 Table of Contents
 
+> 📖 **Comprehensive System Documentation**: For the complete technical architecture reference with all DFDs (Levels 0, 1, 2), Entity-Relationship models, finite state machines, and resilience runbooks, see [docs/SYSTEM_DOCUMENTATION.md](docs/SYSTEM_DOCUMENTATION.md).
+
 - [Overview](#-overview)
 - [Key Features](#-key-features)
 - [System Architecture](#-system-architecture)
