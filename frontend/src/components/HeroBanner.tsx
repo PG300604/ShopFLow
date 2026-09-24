@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import './HeroBanner.css';
@@ -12,8 +12,12 @@ interface Slide {
   description: string;
   cta: string;
   bgClass: string;
-  imageUrl?: string;
-  productId?: string;
+  imageUrl: string;
+  productId: string;
+  price?: number;
+  category?: string;
+  rating?: number;
+  reviewsCount?: number;
 }
 
 interface Promotion {
@@ -23,44 +27,84 @@ interface Promotion {
   tagLine: string;
   description: string;
   imageUrl: string;
+  price?: number;
 }
 
 const defaultSlides: Slide[] = [
   {
     id: 1,
-    tag: 'New Season',
-    title: 'Elevate Your Everyday Essentials',
+    tag: 'Flagship Audio',
+    title: 'Aura Studio Wireless Over-Ear',
     description:
-      'Discover our curated collection of premium products designed for modern living. Quality meets aesthetic perfection.',
-    cta: 'Shop Collection',
+      'Custom acoustic architecture with 40mm dynamic drivers, spatial audio tracking, and 40-hour battery life.',
+    cta: 'Explore Aura Studio',
     bgClass: 'hero-slide-bg--1',
+    imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
+    productId: '101',
+    price: 349.99,
+    category: 'Electronics',
+    rating: 4.9,
+    reviewsCount: 142,
   },
   {
     id: 2,
     tag: 'Limited Edition',
-    title: 'Crafted With Precision & Purpose',
+    title: 'Chronos Swiss Chronograph Watch',
     description:
-      'Exclusive pieces that blend form and function. Each item tells a story of meticulous craftsmanship.',
-    cta: 'Explore Now',
+      'Precision Swiss quartz movement with sapphire crystal glass and interchangeable Italian top-grain leather straps.',
+    cta: 'View Timepiece',
     bgClass: 'hero-slide-bg--2',
+    imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
+    productId: '102',
+    price: 219.00,
+    category: 'Accessories',
+    rating: 4.8,
+    reviewsCount: 96,
   },
   {
     id: 3,
-    tag: 'Summer 2026',
-    title: 'Bold Colors, Timeless Design',
+    tag: 'Workstation Essential',
+    title: 'Terra 75% Mechanical Keyboard',
     description:
-      'This season\'s palette celebrates vibrant energy and natural tones. Find your signature style.',
-    cta: 'View Lookbook',
+      'Solid CNC anodized aluminum frame with hot-swappable Gateron Brown tactile switches and PBT dye-sub keycaps.',
+    cta: 'Shop Keyboard',
     bgClass: 'hero-slide-bg--3',
+    imageUrl: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80',
+    productId: '104',
+    price: 159.00,
+    category: 'Electronics',
+    rating: 4.9,
+    reviewsCount: 210,
   },
   {
     id: 4,
-    tag: 'Free Shipping',
-    title: 'Premium Quality, Delivered Free',
+    tag: 'Urban Commuter',
+    title: 'Vanguard 24L Weatherproof Pack',
     description:
-      'All orders ship free, worldwide. Experience luxury without limits — from our studio to your doorstep.',
-    cta: 'Start Shopping',
+      'Aerodynamic ballistic nylon with dedicated 16-inch laptop chamber, magnetic Fidlock hardware, and hidden RFID security.',
+    cta: 'Discover Pack',
     bgClass: 'hero-slide-bg--4',
+    imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
+    productId: '105',
+    price: 135.00,
+    category: 'Accessories',
+    rating: 4.8,
+    reviewsCount: 88,
+  },
+  {
+    id: 5,
+    tag: 'Artisanal Brew',
+    title: 'Nordic Ceramic Pour-Over Carafe',
+    description:
+      'Handcrafted matte stoneware brewer with double-walled insulated carafe and reusable ultra-fine micro mesh filter.',
+    cta: 'Shop Brewing Gear',
+    bgClass: 'hero-slide-bg--5',
+    imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
+    productId: '103',
+    price: 68.50,
+    category: 'Home & Kitchen',
+    rating: 4.7,
+    reviewsCount: 68,
   },
 ];
 
@@ -108,7 +152,7 @@ export const HeroBanner = () => {
     setSlide([index, dir]);
   };
 
-  // Fetch active promotions from backend on mount
+  // Fetch active promotions from backend on mount (if available)
   useEffect(() => {
     const fetchPromotions = async () => {
       try {
@@ -116,13 +160,14 @@ export const HeroBanner = () => {
         if (promotions && promotions.length > 0) {
           const mapped: Slide[] = promotions.map((p, idx) => ({
             id: idx + 1,
-            tag: p.tagLine,
+            tag: p.tagLine || 'Special Feature',
             title: p.title,
             description: p.description,
             cta: 'Shop Now',
-            bgClass: '',
+            bgClass: `hero-slide-bg--${(idx % 5) + 1}`,
             imageUrl: p.imageUrl,
             productId: p.productId,
+            price: p.price,
           }));
           setSlides(mapped);
           setSlide([0, 0]);
@@ -130,7 +175,7 @@ export const HeroBanner = () => {
           setSlides(defaultSlides);
         }
       } catch (err) {
-        console.error('Failed to load active promotions:', err);
+        console.error('Failed to load active promotions, using default luxury showcase slides:', err);
         setSlides(defaultSlides);
       }
     };
@@ -161,67 +206,121 @@ export const HeroBanner = () => {
           exit="exit"
           transition={{ duration: 0.5, ease: 'easeInOut' as const }}
         >
-          {/* Background with zoom animation */}
+          {/* Ambient background with subtle zoom */}
           <div
             className={`hero-slide-bg ${currentSlide.bgClass}`}
             key={`bg-${currentSlide.id}`}
-            style={
-              currentSlide.imageUrl
-                ? {
-                    backgroundImage: `url(${currentSlide.imageUrl})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                  }
-                : undefined
-            }
           />
           <div className="hero-slide-overlay" />
 
-          {/* Content */}
+          {/* Content Container (Two-column layout on desktop) */}
           <div className="hero-slide-content">
-            <motion.span
-              className="hero-slide-tag"
-              variants={textVariants}
-              initial="hidden"
-              animate="visible"
-              custom={0.1}
-            >
-              {currentSlide.tag}
-            </motion.span>
+            {/* Left Column: Heading, Description, CTA */}
+            <div className="hero-slide-left">
+              <motion.span
+                className="hero-slide-tag"
+                variants={textVariants}
+                initial="hidden"
+                animate="visible"
+                custom={0.1}
+              >
+                {currentSlide.tag}
+              </motion.span>
 
-            <motion.h1
-              className="hero-slide-title"
-              variants={textVariants}
-              initial="hidden"
-              animate="visible"
-              custom={0.25}
-            >
-              {currentSlide.title}
-            </motion.h1>
+              <motion.h1
+                className="hero-slide-title"
+                variants={textVariants}
+                initial="hidden"
+                animate="visible"
+                custom={0.25}
+              >
+                {currentSlide.title}
+              </motion.h1>
 
-            <motion.p
-              className="hero-slide-description"
-              variants={textVariants}
-              initial="hidden"
-              animate="visible"
-              custom={0.4}
-            >
-              {currentSlide.description}
-            </motion.p>
+              <motion.p
+                className="hero-slide-description"
+                variants={textVariants}
+                initial="hidden"
+                animate="visible"
+                custom={0.4}
+              >
+                {currentSlide.description}
+              </motion.p>
 
-            <motion.button
-              className="hero-slide-cta"
-              variants={textVariants}
-              initial="hidden"
-              animate="visible"
-              custom={0.55}
-              onClick={() =>
-                navigate(currentSlide.productId ? `/product/${currentSlide.productId}` : '/')
-              }
-            >
-              {currentSlide.cta}
-              <ArrowRight size={16} strokeWidth={1.5} />
-            </motion.button>
+              <motion.button
+                className="hero-slide-cta"
+                variants={textVariants}
+                initial="hidden"
+                animate="visible"
+                custom={0.55}
+                onClick={() =>
+                  navigate(currentSlide.productId ? `/product/${currentSlide.productId}` : '/')
+                }
+              >
+                {currentSlide.cta}
+                <ArrowRight size={16} strokeWidth={1.5} />
+              </motion.button>
+            </div>
+
+            {/* Right Column: Hero Product Showcase Visual Card */}
+            <div className="hero-slide-right">
+              <motion.div
+                className="hero-product-card"
+                initial={{ opacity: 0, scale: 0.92, y: 25 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                onClick={() =>
+                  navigate(currentSlide.productId ? `/product/${currentSlide.productId}` : '/')
+                }
+              >
+                <div className="hero-product-image-wrap">
+                  <img
+                    src={currentSlide.imageUrl}
+                    alt={currentSlide.title}
+                    className="hero-product-image"
+                    loading="eager"
+                  />
+                  <div className="hero-product-glass-glow" />
+
+                  {currentSlide.rating && (
+                    <div className="hero-product-badge-rating">
+                      <Star size={13} className="hero-product-star-icon" />
+                      <span>{currentSlide.rating.toFixed(1)}</span>
+                      {currentSlide.reviewsCount && (
+                        <span className="hero-product-review-count">
+                          ({currentSlide.reviewsCount})
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {currentSlide.category && (
+                    <div className="hero-product-badge-category">
+                      {currentSlide.category}
+                    </div>
+                  )}
+                </div>
+
+                <div className="hero-product-info">
+                  <div className="hero-product-details">
+                    <span className="hero-product-name">{currentSlide.title}</span>
+                    <span className="hero-product-status">
+                      <span className="hero-product-status-dot" />
+                      In Stock • Priority Delivery
+                    </span>
+                  </div>
+
+                  {currentSlide.price !== undefined && (
+                    <div className="hero-product-price-box">
+                      <span className="hero-product-price-label">Price</span>
+                      <span className="hero-product-price">
+                        ${currentSlide.price.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </div>
           </div>
         </motion.div>
       </AnimatePresence>
