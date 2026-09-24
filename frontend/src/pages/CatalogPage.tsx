@@ -110,7 +110,11 @@ export const CatalogPage: React.FC = () => {
   }, [products, activeCategory, priceRange, sortBy]);
 
   const handleAddToCart = (product: Product) => {
-    addItem(product.id, 1);
+    addItem(product.id, 1, {
+      productName: product.name,
+      productPrice: product.price,
+      productImage: product.imageUrl,
+    });
   };
 
   return (

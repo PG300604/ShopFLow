@@ -140,7 +140,11 @@ export const DetailPage: React.FC = () => {
 
   const handleAddToCart = useCallback(() => {
     if (!product) return;
-    addItem(product.id, 1);
+    addItem(product.id, 1, {
+      productName: product.name,
+      productPrice: product.price,
+      productImage: product.imageUrl,
+    });
   }, [product, addItem]);
 
   const handleSubmitReview = async (e: React.FormEvent) => {

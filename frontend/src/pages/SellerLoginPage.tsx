@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, AlertCircle, Store } from 'lucide-react';
+import { Mail, Lock, AlertCircle, Store, KeyRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './LoginPage.css';
 
@@ -12,7 +12,7 @@ export const SellerLoginPage: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, registerSeller } = useAuth();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -30,36 +30,18 @@ export const SellerLoginPage: React.FC = () => {
       }
     } catch (err: any) {
       const message =
-        err?.response?.data?.message ||
         err?.message ||
-        'Invalid email or password. Please try again.';
+        'Invalid email or password. Please use seller@shopflow.com with password: password123';
       setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleBypassSeller = async () => {
+  const handleQuickFillSeller = () => {
+    setEmail('seller@shopflow.com');
+    setPassword('password123');
     setError('');
-    setLoading(true);
-    const bypassEmail = 'seller_bypass@shopflow.com';
-    const bypassPassword = 'password123';
-    const bypassName = 'ShopFlow Seller';
-    const storeName = 'Premium Store';
-
-    try {
-      await login(bypassEmail, bypassPassword);
-      navigate('/seller/dashboard');
-    } catch (err: any) {
-      try {
-        await registerSeller(bypassName, bypassEmail, bypassPassword, storeName);
-        navigate('/seller/dashboard');
-      } catch (regErr: any) {
-        setError('Seller bypass failed: ' + (regErr?.message || 'Could not register/login'));
-      }
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -144,43 +126,44 @@ export const SellerLoginPage: React.FC = () => {
           </button>
         </form>
 
-        <div className="login-divider" style={{ margin: '1.25rem 0', display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-          <span style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }}></span>
-          <span style={{ padding: '0 0.75rem' }}>or</span>
-          <span style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }}></span>
+        <div style={{
+          marginTop: '1.25rem',
+          padding: '0.85rem 1rem',
+          borderRadius: '8px',
+          background: 'rgba(59, 130, 246, 0.05)',
+          border: '1px solid rgba(59, 130, 246, 0.2)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.5rem',
+          alignItems: 'center'
+        }}>
+          <button
+            type="button"
+            onClick={handleQuickFillSeller}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              padding: '0.45rem 1rem',
+              borderRadius: '6px',
+              border: '1px solid rgba(59, 130, 246, 0.4)',
+              background: 'rgba(59, 130, 246, 0.1)',
+              color: '#60a5fa',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <KeyRound size={13} />
+            Fill Seller Credentials (seller@shopflow.com)
+          </button>
+          <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>
+            Password: <strong style={{ color: 'var(--color-active)' }}>password123</strong>
+          </span>
         </div>
 
-        <button
-          type="button"
-          onClick={handleBypassSeller}
-          disabled={loading}
-          className="login-bypass-btn"
-          style={{
-            width: '100%',
-            padding: '0.65rem 1rem',
-            borderRadius: '4px',
-            border: '1px dashed var(--color-border)',
-            backgroundColor: 'transparent',
-            color: 'var(--color-text-muted)',
-            fontSize: '0.8rem',
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            textAlign: 'center'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'var(--color-active)';
-            e.currentTarget.style.color = 'var(--color-active)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--color-border)';
-            e.currentTarget.style.color = 'var(--color-text-muted)';
-          }}
-        >
-          Bypass: Seller
-        </button>
-
-        <div className="login-footer" style={{ marginTop: '1.5rem' }}>
+        <div className="login-footer" style={{ marginTop: '1.25rem' }}>
           Interested in selling?{' '}
           <Link to="/seller/register" className="login-footer__link">
             Register your store

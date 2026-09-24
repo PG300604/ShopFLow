@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, AlertCircle, ShieldAlert } from 'lucide-react';
+import { Mail, Lock, AlertCircle, ShieldAlert, KeyRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './LoginPage.css';
 
@@ -12,7 +12,7 @@ export const AdminLoginPage: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, register } = useAuth();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -30,35 +30,18 @@ export const AdminLoginPage: React.FC = () => {
       }
     } catch (err: any) {
       const message =
-        err?.response?.data?.message ||
         err?.message ||
-        'Invalid admin credentials. Please try again.';
+        'Invalid admin credentials. Please use admin@shopflow.com with password: password123';
       setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleBypassAdmin = async () => {
+  const handleQuickFillAdmin = () => {
+    setEmail('admin@shopflow.com');
+    setPassword('password123');
     setError('');
-    setLoading(true);
-    const bypassEmail = 'admin@shopflow.com';
-    const bypassPassword = 'password123';
-    const bypassName = 'ShopFlow Admin';
-
-    try {
-      await login(bypassEmail, bypassPassword);
-      navigate('/admin/dashboard');
-    } catch (err: any) {
-      try {
-        await register(bypassName, bypassEmail, bypassPassword);
-        navigate('/admin/dashboard');
-      } catch (regErr: any) {
-        setError('Admin bypass failed: ' + (regErr?.message || 'Could not register/login'));
-      }
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -150,41 +133,42 @@ export const AdminLoginPage: React.FC = () => {
           </button>
         </form>
 
-        <div className="login-divider" style={{ margin: '1.25rem 0', display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-          <span style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }}></span>
-          <span style={{ padding: '0 0.75rem' }}>or</span>
-          <span style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }}></span>
+        <div style={{
+          marginTop: '1.25rem',
+          padding: '0.85rem 1rem',
+          borderRadius: '8px',
+          background: 'rgba(239, 68, 68, 0.05)',
+          border: '1px solid rgba(239, 68, 68, 0.2)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.5rem',
+          alignItems: 'center'
+        }}>
+          <button
+            type="button"
+            onClick={handleQuickFillAdmin}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              padding: '0.45rem 1rem',
+              borderRadius: '6px',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              background: 'rgba(239, 68, 68, 0.1)',
+              color: '#f87171',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <KeyRound size={13} />
+            Fill Admin Credentials (admin@shopflow.com)
+          </button>
+          <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>
+            Password: <strong style={{ color: 'var(--color-active)' }}>password123</strong>
+          </span>
         </div>
-
-        <button
-          type="button"
-          onClick={handleBypassAdmin}
-          disabled={loading}
-          className="login-bypass-btn"
-          style={{
-            width: '100%',
-            padding: '0.65rem 1rem',
-            borderRadius: '4px',
-            border: '1px dashed var(--color-border)',
-            backgroundColor: 'transparent',
-            color: 'var(--color-text-muted)',
-            fontSize: '0.8rem',
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            textAlign: 'center'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgb(239, 68, 68)';
-            e.currentTarget.style.color = 'rgb(239, 68, 68)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--color-border)';
-            e.currentTarget.style.color = 'var(--color-text-muted)';
-          }}
-        >
-          Bypass: Admin
-        </button>
       </motion.div>
     </div>
   );

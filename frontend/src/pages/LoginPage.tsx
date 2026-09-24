@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
+import { LogIn, Mail, Lock, AlertCircle, Shield, Store, UserCheck, KeyRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './LoginPage.css';
 
@@ -12,15 +12,14 @@ export const LoginPage: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, loginWithGoogle, register, registerSeller } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleLoginWithCredentials = async (loginEmail: string, loginPass: string) => {
     setError('');
     setLoading(true);
 
     try {
-      const loggedUser = await login(email, password);
+      const loggedUser = await login(loginEmail, loginPass);
       if (loggedUser.role === 'ADMIN' || loggedUser.email === 'admin@shopflow.com') {
         navigate('/admin/dashboard');
       } else if (loggedUser.role === 'SELLER') {
@@ -30,13 +29,23 @@ export const LoginPage: React.FC = () => {
       }
     } catch (err: any) {
       const message =
-        err?.response?.data?.message ||
         err?.message ||
-        'Invalid email or password. Please try again.';
+        'Invalid email or password. Please use password: password123';
       setError(message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    await handleLoginWithCredentials(email, password);
+  };
+
+  const handleQuickFill = (demoEmail: string) => {
+    setEmail(demoEmail);
+    setPassword('password123');
+    setError('');
   };
 
   const handleGoogleClick = async () => {
@@ -47,73 +56,6 @@ export const LoginPage: React.FC = () => {
       navigate('/');
     } catch (err: any) {
       setError('Google authentication failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBypassCustomer = async () => {
-    setError('');
-    setLoading(true);
-    const bypassEmail = 'customer@shopflow.com';
-    const bypassPassword = 'password123';
-    const bypassName = 'ShopFlow Customer';
-
-    try {
-      await login(bypassEmail, bypassPassword);
-      navigate('/');
-    } catch (err: any) {
-      try {
-        await register(bypassName, bypassEmail, bypassPassword);
-        navigate('/');
-      } catch (regErr: any) {
-        setError('Customer bypass failed: ' + (regErr?.message || 'Could not register/login'));
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBypassSeller = async () => {
-    setError('');
-    setLoading(true);
-    const bypassEmail = 'seller_bypass@shopflow.com';
-    const bypassPassword = 'password123';
-    const bypassName = 'ShopFlow Seller';
-    const storeName = 'Premium Store';
-
-    try {
-      await login(bypassEmail, bypassPassword);
-      navigate('/seller/dashboard');
-    } catch (err: any) {
-      try {
-        await registerSeller(bypassName, bypassEmail, bypassPassword, storeName);
-        navigate('/seller/dashboard');
-      } catch (regErr: any) {
-        setError('Seller bypass failed: ' + (regErr?.message || 'Could not register/login'));
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBypassAdmin = async () => {
-    setError('');
-    setLoading(true);
-    const bypassEmail = 'admin@shopflow.com';
-    const bypassPassword = 'password123';
-    const bypassName = 'ShopFlow Admin';
-
-    try {
-      await login(bypassEmail, bypassPassword);
-      navigate('/admin/dashboard');
-    } catch (err: any) {
-      try {
-        await register(bypassName, bypassEmail, bypassPassword);
-        navigate('/admin/dashboard');
-      } catch (regErr: any) {
-        setError('Admin bypass failed: ' + (regErr?.message || 'Could not register/login'));
-      }
     } finally {
       setLoading(false);
     }
@@ -201,7 +143,109 @@ export const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        <div className="login-divider" style={{ margin: '1.5rem 0', display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+        {/* Demo Credentials Auto-Fill Pill Bar */}
+        <div style={{
+          marginTop: '1.25rem',
+          padding: '1rem',
+          borderRadius: '8px',
+          background: 'rgba(255, 255, 255, 0.03)',
+          border: '1px solid var(--color-border)',
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            color: 'var(--color-text-muted)',
+            marginBottom: '0.65rem'
+          }}>
+            <KeyRound size={13} color="#10b981" />
+            <span>Demo Accounts (Click to Fill)</span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.45rem' }}>
+            <button
+              type="button"
+              onClick={() => handleQuickFill('customer@shopflow.com')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.35rem',
+                padding: '0.45rem 0.5rem',
+                borderRadius: '6px',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                background: 'rgba(16, 185, 129, 0.08)',
+                color: '#10b981',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              title="customer@shopflow.com / password123"
+            >
+              <UserCheck size={12} />
+              Customer
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleQuickFill('seller@shopflow.com')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.35rem',
+                padding: '0.45rem 0.5rem',
+                borderRadius: '6px',
+                border: '1px solid rgba(59, 130, 246, 0.3)',
+                background: 'rgba(59, 130, 246, 0.08)',
+                color: '#60a5fa',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              title="seller@shopflow.com / password123"
+            >
+              <Store size={12} />
+              Seller
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleQuickFill('admin@shopflow.com')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.35rem',
+                padding: '0.45rem 0.5rem',
+                borderRadius: '6px',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                background: 'rgba(239, 68, 68, 0.08)',
+                color: '#f87171',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              title="admin@shopflow.com / password123"
+            >
+              <Shield size={12} />
+              Admin
+            </button>
+          </div>
+
+          <div style={{ marginTop: '0.5rem', fontSize: '0.7rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+            Password for all accounts: <strong style={{ color: 'var(--color-active)' }}>password123</strong>
+          </div>
+        </div>
+
+        <div className="login-divider" style={{ margin: '1.25rem 0', display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
           <span style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }}></span>
           <span style={{ padding: '0 0.75rem' }}>or</span>
           <span style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }}></span>
@@ -215,7 +259,7 @@ export const LoginPage: React.FC = () => {
           style={{
             width: '100%',
             padding: '0.75rem 1.5rem',
-            borderRadius: '4px',
+            borderRadius: '6px',
             border: '1px solid var(--color-border)',
             backgroundColor: 'var(--bg-primary)',
             color: 'var(--color-active)',
@@ -227,14 +271,6 @@ export const LoginPage: React.FC = () => {
             transition: 'background-color 0.2s ease, border-color 0.2s ease',
             cursor: 'pointer'
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
-            e.currentTarget.style.borderColor = 'var(--color-active)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--bg-primary)';
-            e.currentTarget.style.borderColor = 'var(--color-border)';
-          }}
         >
           <svg width="18" height="18" viewBox="0 0 18 18" style={{ display: 'block' }}>
             <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.24h2.9c1.69-1.55 2.69-3.85 2.69-6.57z"/>
@@ -245,99 +281,7 @@ export const LoginPage: React.FC = () => {
           Continue with Google
         </button>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.75rem' }}>
-          <button
-            type="button"
-            onClick={handleBypassCustomer}
-            disabled={loading}
-            className="login-bypass-btn"
-            style={{
-              width: '100%',
-              padding: '0.65rem 1rem',
-              borderRadius: '4px',
-              border: '1px dashed var(--color-border)',
-              backgroundColor: 'transparent',
-              color: 'var(--color-text-muted)',
-              fontSize: '0.8rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              textAlign: 'center'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-active)';
-              e.currentTarget.style.color = 'var(--color-active)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-border)';
-              e.currentTarget.style.color = 'var(--text-muted)';
-            }}
-          >
-            Bypass: Customer
-          </button>
-
-          <button
-            type="button"
-            onClick={handleBypassSeller}
-            disabled={loading}
-            className="login-bypass-btn"
-            style={{
-              width: '100%',
-              padding: '0.65rem 1rem',
-              borderRadius: '4px',
-              border: '1px dashed var(--color-border)',
-              backgroundColor: 'transparent',
-              color: 'var(--color-text-muted)',
-              fontSize: '0.8rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              textAlign: 'center'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-active)';
-              e.currentTarget.style.color = 'var(--color-active)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-border)';
-              e.currentTarget.style.color = 'var(--text-muted)';
-            }}
-          >
-            Bypass: Seller
-          </button>
-
-          <button
-            type="button"
-            onClick={handleBypassAdmin}
-            disabled={loading}
-            className="login-bypass-btn"
-            style={{
-              width: '100%',
-              padding: '0.65rem 1rem',
-              borderRadius: '4px',
-              border: '1px dashed var(--color-border)',
-              backgroundColor: 'transparent',
-              color: 'var(--color-text-muted)',
-              fontSize: '0.8rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              textAlign: 'center'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-active)';
-              e.currentTarget.style.color = 'var(--color-active)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-border)';
-              e.currentTarget.style.color = 'var(--text-muted)';
-            }}
-          >
-            Bypass: Admin
-          </button>
-        </div>
-
-        <div className="login-footer" style={{ marginTop: '1.5rem' }}>
+        <div className="login-footer" style={{ marginTop: '1.25rem' }}>
           New to ShopFlow?{' '}
           <Link to="/register" className="login-footer__link">
             Create Account
