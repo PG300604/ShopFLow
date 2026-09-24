@@ -2,8 +2,10 @@
 
 # 🛍️ ShopFlow
 
-### Production-grade multi-vendor e-commerce platform engineered with Java 17, Spring Boot 3.3.1 microservices, two-phase inventory reservation, Stripe payments, and a Vite + React glassmorphic frontend
+### Production-grade multi-vendor e-commerce platform engineered from the ground up as a solo full-stack initiative — featuring Java 17, Spring Boot 3.3.1 microservices, two-phase inventory reservation, Stripe payments, and a Pinterest-inspired React frontend
 
+[![Author](https://img.shields.io/badge/Author-Priyanshu_Garg-blue?logo=github)](https://github.com/PG300604)
+[![Project Type](https://img.shields.io/badge/Project-Solo_Engineering-8A2BE2)](#-author--solo-engineering-note)
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3.1-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Spring Cloud](https://img.shields.io/badge/Spring_Cloud-2023.0.2-blue?logo=spring)](https://spring.io/projects/spring-cloud)
@@ -45,23 +47,25 @@
   - [Automated Backend Unit & Security Tests](#automated-backend-unit--security-tests)
   - [End-to-End Playwright Browser Suite](#end-to-end-playwright-browser-suite)
   - [Postman E2E Regression Collection](#postman-e2e-regression-collection)
+- [Author & Solo Engineering Note](#-author--solo-engineering-note)
 - [License](#-license)
 
 ---
 
 ## 🌟 Overview
 
-**ShopFlow** is an enterprise-grade, distributed multi-vendor e-commerce platform built to simulate high-throughput commerce workflows across independent, fault-tolerant microservices. 
+**ShopFlow** is an enterprise-grade, distributed multi-vendor e-commerce platform designed, architected, and engineered entirely by **Priyanshu Garg** as an end-to-end solo initiative. 
 
-It addresses common distributed commerce challenges: **overselling under concurrent checkouts**, **distributed transaction rollback**, **asynchronous payment confirmation**, **multi-vendor data isolation**, and **un-opinionated custom glassmorphic UX** without third-party styling framework lock-in.
+It addresses common distributed commerce challenges: **overselling under concurrent checkouts**, **distributed transaction rollback**, **asynchronous payment confirmation**, **multi-vendor data isolation**, **native INR (₹) currency localization**, and a **clean Pinterest-inspired minimalist editorial UI** without heavy third-party framework lock-in.
 
 ### Core Capabilities at a Glance
 
 - **Two-Phase Inventory Reservation**: Concurrency-safe reservation locks (`PENDING` $\rightarrow$ `COMMITTED` / `RELEASED`) prevent overselling when multiple shoppers purchase the last stock unit simultaneously.
 - **Asynchronous Stripe Webhook Pipeline**: Idempotent webhook listener decouples payment authorization from synchronous user browser requests, ensuring guaranteed order fulfillment even on network drops.
+- **Interactive Stripe Payment Modal & Resilient Checkout**: Embedded modal featuring Credit/Debit Card and UPI payment methods with automatic test-card filling and client fallback confirmation (`#SF-XXXXXX`).
 - **Strict Multi-Vendor Scoping**: Complete catalog and order partitioning where sellers manage their independent product inventories and query seller-filtered fulfillment pipelines (`/api/orders/seller/mine`).
 - **Distributed Service Mesh with Eureka & API Gateway**: Unified routing, dynamic client-side load balancing, JWT claims propagation, and OpenFeign inter-service communication.
-- **Zero-Dependency Glassmorphic UI**: High-performance React 18 frontend written in pure Vanilla CSS design tokens with adaptive Light/Dark/System themes, drawer cart synchronization, and real-time inventory telemetry.
+- **Pinterest-Inspired Editorial UI**: High-performance React 18 frontend written in pure CSS with 3-column rounded editorial grid, category count pills, color swatches, size filters, and full INR (`₹`) formatting.
 
 ---
 
@@ -647,6 +651,21 @@ A comprehensive Postman test suite ([`ShopFlow_E2E_Tests.postman_collection.json
 1. Import `ShopFlow_E2E_Tests.postman_collection.json` into Postman.
 2. Set the collection variable `baseUrl` to `http://localhost:8080`.
 3. Run the collection to validate authentication, multi-vendor product CRUD, checkout, and inventory decrement flows.
+
+---
+
+## 👤 Author & Solo Engineering Note
+
+**ShopFlow** was conceived, architected, and engineered entirely by **Priyanshu Garg** as a solo full-stack project.
+
+- **Author**: Priyanshu Garg ([GitHub Profile](https://github.com/PG300604))
+- **Engineering Scope**:
+  - **System Architecture**: Designed the distributed domain boundaries across 6 microservices, Eureka service discovery, and Spring Cloud API Gateway.
+  - **Data Consistency**: Implemented two-phase inventory reservation locks (`PENDING` $\rightarrow$ `COMMITTED` / `RELEASED`) and automatic timeout sweepers to prevent overselling.
+  - **Security & Multi-Tenancy**: Built role-based access control (Customer, Seller, Admin), stateless JWT validation, and multi-tenant data scoping.
+  - **Payments Pipeline**: Engineered Stripe integration with webhook signature verification, card and UPI modal, and client fallback handling.
+  - **Frontend UI/UX**: Designed and developed the React 18 + Vite frontend with custom CSS, dark/light modes, Pinterest-inspired 3-column editorial grid, and INR currency formatting.
+  - **DevOps & Testing**: Built Docker configurations, Playwright browser test suites, and Postman end-to-end regression collections.
 
 ---
 
