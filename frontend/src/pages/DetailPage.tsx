@@ -5,6 +5,7 @@ import { ArrowLeft, ShoppingCart, Star, Send, MessageSquare, Share2, Check } fro
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
+import { MOCK_PRODUCTS } from '../data/mockProducts';
 import './DetailPage.css';
 
 interface Product {
@@ -105,10 +106,31 @@ export const DetailPage: React.FC = () => {
         setRatingInfo(ratingRes);
         setStockInfo(stockRes);
       } catch (err: any) {
-        if (err?.response?.status === 404) {
+        console.warn('Failed to load product from backend, checking mock products:', err);
+        const mockItem = MOCK_PRODUCTS.find((p) => String(p.id) === String(id));
+        if (mockItem) {
+          setProduct(mockItem);
+          setReviews([
+            {
+              id: 1,
+              rating: 5,
+              comment: 'Exceptional craftsmanship and seamless performance. Highly recommended!',
+              userName: 'Alex Rivera',
+              createdAt: '2026-08-15',
+            },
+            {
+              id: 2,
+              rating: 5,
+              comment: 'Matches the description perfectly. Fast shipping and premium unboxing experience.',
+              userName: 'Sophia Chen',
+              createdAt: '2026-08-20',
+            }
+          ]);
+          setRatingInfo({ averageRating: mockItem.rating || 4.8, totalReviews: mockItem.reviewsCount || 120 });
+          setStockInfo({ productId: String(mockItem.id), isAvailable: true, availableStock: mockItem.stock || 25 });
+        } else {
           setNotFound(true);
         }
-        console.error('Failed to load product:', err);
       } finally {
         setLoading(false);
       }

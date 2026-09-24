@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ShoppingCart, Eye, PackageOpen, Filter, ArrowUpDown } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
+import { MOCK_PRODUCTS } from '../data/mockProducts';
 import './SearchResultsPage.css';
 
 interface Product {
@@ -110,16 +111,16 @@ export const SearchResultsPage: React.FC = () => {
       setLoading(true);
       try {
         const res = await api.get<any>('/products');
-        if (res && Array.isArray(res)) {
+        if (res && Array.isArray(res) && res.length > 0) {
           setProducts(res);
-        } else if (res && res.content && Array.isArray(res.content)) {
+        } else if (res && res.content && Array.isArray(res.content) && res.content.length > 0) {
           setProducts(res.content);
         } else {
-          setProducts([]);
+          setProducts(MOCK_PRODUCTS);
         }
       } catch (err) {
-        console.error('Failed to fetch products for search:', err);
-        setProducts([]);
+        console.warn('Failed to fetch products for search from backend, using fallback:', err);
+        setProducts(MOCK_PRODUCTS);
       } finally {
         setLoading(false);
       }

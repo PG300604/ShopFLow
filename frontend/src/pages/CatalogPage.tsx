@@ -5,6 +5,7 @@ import { ShoppingCart, Eye, PackageOpen, Filter, ArrowUpDown } from 'lucide-reac
 import { HeroBanner } from '../components/HeroBanner';
 import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
+import { MOCK_PRODUCTS } from '../data/mockProducts';
 import './CatalogPage.css';
 
 interface Product {
@@ -47,7 +48,7 @@ function SkeletonCard() {
 }
 
 export const CatalogPage: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>(MOCK_PRODUCTS);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
   const [priceRange, setPriceRange] = useState<string>('all');
@@ -58,16 +59,16 @@ export const CatalogPage: React.FC = () => {
     const fetchProducts = async () => {
       try {
         const res = await api.get<any>('/products');
-        if (res && Array.isArray(res)) {
+        if (res && Array.isArray(res) && res.length > 0) {
           setProducts(res);
-        } else if (res && res.content && Array.isArray(res.content)) {
+        } else if (res && res.content && Array.isArray(res.content) && res.content.length > 0) {
           setProducts(res.content);
         } else {
-          setProducts([]);
+          setProducts(MOCK_PRODUCTS);
         }
       } catch (err) {
-        console.error('Failed to fetch products:', err);
-        setProducts([]);
+        console.warn('Backend unavailable, using catalog showcase mock data:', err);
+        setProducts(MOCK_PRODUCTS);
       } finally {
         setLoading(false);
       }
