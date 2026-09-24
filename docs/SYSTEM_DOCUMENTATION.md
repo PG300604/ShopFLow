@@ -1,6 +1,6 @@
 # ShopFlow — Complete System Architecture & Technical Documentation
 
-**Author & Solo Engineer**: Priyanshu Garg ([@PG300604](https://github.com/PG300604))  
+**Author & Solo Engineer**: Priyanshu Ghosh ([@PG300604](https://github.com/PG300604))  
 **Platform Version**: 1.0.0-RELEASE  
 **Architecture Style**: Distributed Domain-Driven Microservices  
 **Frontend Framework**: React 18, TypeScript 5, Vite, Pure CSS  
