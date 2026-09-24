@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
+import { formatPrice } from '../utils/format';
 import './AdminDashboard.css'; // Reuse established Dark Brutalism CSS tokens
 
 interface Product {
@@ -272,7 +273,7 @@ export const SellerDashboard: React.FC = () => {
                     <TrendingUp size={20} />
                   </div>
                   <span className="stat-card__label">My Net Earnings</span>
-                  <span className="stat-card__value">${calculateTotalEarnings().toFixed(2)}</span>
+                  <span className="stat-card__value">{formatPrice(calculateTotalEarnings())}</span>
                 </div>
                 <div className="stat-card">
                   <div className="stat-card__icon">
@@ -311,7 +312,7 @@ export const SellerDashboard: React.FC = () => {
                             <td className="font-mono" style={{ fontSize: '0.8rem' }}>{order.id.slice(0, 8)}...</td>
                             <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                             <td className="truncate-text" style={{ maxWidth: '200px' }}>{order.shippingAddress}</td>
-                            <td>${order.totalAmount.toFixed(2)}</td>
+                            <td>{formatPrice(order.totalAmount)}</td>
                             <td>
                               <span className={`status-pill status-pill--${order.status.toLowerCase()}`}>
                                 {order.status}
@@ -387,7 +388,7 @@ export const SellerDashboard: React.FC = () => {
                             </p>
                           </td>
                           <td>{prod.category}</td>
-                          <td>${prod.price.toFixed(2)}</td>
+                          <td>{formatPrice(prod.price)}</td>
                           <td style={{ textAlign: 'right' }}>
                             <div className="table-actions-group">
                               <button
@@ -473,7 +474,7 @@ export const SellerDashboard: React.FC = () => {
                               ))}
                             </div>
                           </td>
-                          <td>${order.totalAmount.toFixed(2)}</td>
+                          <td>{formatPrice(order.totalAmount)}</td>
                           <td>
                             <span className={`status-pill status-pill--${order.status.toLowerCase()}`}>
                               {order.status}
@@ -540,7 +541,7 @@ export const SellerDashboard: React.FC = () => {
 
                 <div className="form-row">
                   <div className="form-field">
-                    <label>Price ($)</label>
+                    <label>Price (₹)</label>
                     <input
                       type="number"
                       step="0.01"

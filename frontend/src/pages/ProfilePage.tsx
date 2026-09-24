@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
+import { formatPrice } from '../utils/format';
 import './ProfilePage.css';
 
 interface OrderItem {
@@ -260,7 +261,7 @@ export const ProfilePage: React.FC = () => {
                   <ul className="order-card__items">
                     {order.items.map((item, idx) => (
                       <li key={idx}>
-                        {item.productName || `Product #${item.productId}`} × {item.quantity} — ${item.unitPrice.toFixed(2)}
+                        {item.productName || `Product #${item.productId}`} × {item.quantity} — {formatPrice(item.unitPrice)}
                       </li>
                     ))}
                   </ul>
@@ -268,7 +269,7 @@ export const ProfilePage: React.FC = () => {
                   <div className="order-card__footer">
                     <span className="order-card__total-label">Total paid</span>
                     <span className="order-card__total-value">
-                      ${order.totalAmount.toFixed(2)}
+                      {formatPrice(order.totalAmount)}
                     </span>
                   </div>
                 </motion.div>

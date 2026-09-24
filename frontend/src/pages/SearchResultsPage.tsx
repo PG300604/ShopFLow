@@ -5,6 +5,7 @@ import { ShoppingCart, Eye, PackageOpen, Filter, ArrowUpDown } from 'lucide-reac
 import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
 import { MOCK_PRODUCTS } from '../data/mockProducts';
+import { formatPrice } from '../utils/format';
 import './SearchResultsPage.css';
 
 interface Product {
@@ -147,14 +148,14 @@ export const SearchResultsPage: React.FC = () => {
       
       // 3. Price Filter
       let matchesPrice = true;
-      if (priceRange === 'under-25') {
-        matchesPrice = p.price < 25;
-      } else if (priceRange === '25-50') {
-        matchesPrice = p.price >= 25 && p.price <= 50;
-      } else if (priceRange === '50-100') {
-        matchesPrice = p.price >= 50 && p.price <= 100;
-      } else if (priceRange === 'over-100') {
-        matchesPrice = p.price > 100;
+      if (priceRange === 'under-2000') {
+        matchesPrice = p.price < 2000;
+      } else if (priceRange === '2000-4000') {
+        matchesPrice = p.price >= 2000 && p.price <= 4000;
+      } else if (priceRange === '4000-8000') {
+        matchesPrice = p.price >= 4000 && p.price <= 8000;
+      } else if (priceRange === 'over-8000') {
+        matchesPrice = p.price > 8000;
       }
 
       return matchesCategory && matchesSearch && matchesPrice;
@@ -215,10 +216,10 @@ export const SearchResultsPage: React.FC = () => {
             <div className="filter-options-list">
               {[
                 { label: 'All Prices', value: 'all' },
-                { label: 'Under $25', value: 'under-25' },
-                { label: '$25 to $50', value: '25-50' },
-                { label: '$50 to $100', value: '50-100' },
-                { label: 'Over $100', value: 'over-100' },
+                { label: 'Under ₹2,000', value: 'under-2000' },
+                { label: '₹2,000 to ₹4,000', value: '2000-4000' },
+                { label: '₹4,000 to ₹8,000', value: '4000-8000' },
+                { label: 'Over ₹8,000', value: 'over-8000' },
               ].map((opt) => (
                 <label key={opt.value} className="filter-checkbox-label">
                   <input
@@ -294,7 +295,7 @@ export const SearchResultsPage: React.FC = () => {
                   <div className="product-card__body">
                     <h3 className="product-card__name">{product.name}</h3>
                     <span className="product-card__price">
-                      ${product.price.toFixed(2)}
+                      {formatPrice(product.price)}
                     </span>
                     <div className="product-card__actions">
                       <button

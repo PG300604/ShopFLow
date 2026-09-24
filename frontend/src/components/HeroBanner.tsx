@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ArrowRight, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import { formatPrice } from '../utils/format';
 import './HeroBanner.css';
 
 interface Slide {
@@ -33,78 +34,78 @@ interface Promotion {
 const defaultSlides: Slide[] = [
   {
     id: 1,
-    tag: 'Flagship Audio',
+    tag: 'Wink Collection 2026',
+    title: 'Japan Green Outer Jacket',
+    description:
+      'Minimalist military-inspired utility jacket tailored with durable water-repellent Japanese cotton twill and matte horn buttons.',
+    cta: 'Explore Collection',
+    bgClass: 'hero-slide-bg--1',
+    imageUrl: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=800&q=80',
+    productId: '1',
+    price: 3499,
+    category: 'Outerwear',
+    rating: 4.9,
+    reviewsCount: 148,
+  },
+  {
+    id: 2,
+    tag: 'Acoustic Flagship',
     title: 'Aura Studio Wireless Over-Ear',
     description:
       'Custom acoustic architecture with 40mm dynamic drivers, spatial audio tracking, and 40-hour battery life.',
     cta: 'Explore Aura Studio',
-    bgClass: 'hero-slide-bg--1',
+    bgClass: 'hero-slide-bg--2',
     imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
-    productId: '101',
-    price: 349.99,
-    category: 'Electronics',
+    productId: '9',
+    price: 18999,
+    category: 'Tech & Lifestyle',
     rating: 4.9,
     reviewsCount: 142,
   },
   {
-    id: 2,
-    tag: 'Limited Edition',
+    id: 3,
+    tag: 'Everyday Essential',
+    title: 'Soft Minimalist Sage Hoodie',
+    description:
+      'Cloud-soft 450 GSM brushed French terry cotton hoodie featuring double-layer hood, hidden phone pouch, and seamless cuffs.',
+    cta: 'Shop Hoodie',
+    bgClass: 'hero-slide-bg--3',
+    imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
+    productId: '3',
+    price: 2799,
+    category: 'Hoodies',
+    rating: 4.9,
+    reviewsCount: 185,
+  },
+  {
+    id: 4,
+    tag: 'Limited Timepiece',
     title: 'Chronos Swiss Chronograph Watch',
     description:
       'Precision Swiss quartz movement with sapphire crystal glass and interchangeable Italian top-grain leather straps.',
     cta: 'View Timepiece',
-    bgClass: 'hero-slide-bg--2',
+    bgClass: 'hero-slide-bg--4',
     imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
-    productId: '102',
-    price: 219.00,
+    productId: '10',
+    price: 12499,
     category: 'Accessories',
     rating: 4.8,
     reviewsCount: 96,
   },
   {
-    id: 3,
-    tag: 'Workstation Essential',
-    title: 'Terra 75% Mechanical Keyboard',
-    description:
-      'Solid CNC anodized aluminum frame with hot-swappable Gateron Brown tactile switches and PBT dye-sub keycaps.',
-    cta: 'Shop Keyboard',
-    bgClass: 'hero-slide-bg--3',
-    imageUrl: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80',
-    productId: '104',
-    price: 159.00,
-    category: 'Electronics',
-    rating: 4.9,
-    reviewsCount: 210,
-  },
-  {
-    id: 4,
-    tag: 'Urban Commuter',
-    title: 'Vanguard 24L Weatherproof Pack',
-    description:
-      'Aerodynamic ballistic nylon with dedicated 16-inch laptop chamber, magnetic Fidlock hardware, and hidden RFID security.',
-    cta: 'Discover Pack',
-    bgClass: 'hero-slide-bg--4',
-    imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
-    productId: '105',
-    price: 135.00,
-    category: 'Accessories',
-    rating: 4.8,
-    reviewsCount: 88,
-  },
-  {
     id: 5,
-    tag: 'Artisanal Brew',
-    title: 'Nordic Ceramic Pour-Over Carafe',
+    tag: 'Modern Tailoring',
+    title: 'One Set Tailored Modern Suit',
     description:
-      'Handcrafted matte stoneware brewer with double-walled insulated carafe and reusable ultra-fine micro mesh filter.',
-    cta: 'Shop Brewing Gear',
+      'Two-piece deconstructed blazer and relaxed pleat trousers crafted with breathable wool-blend fabric for effortless elegance.',
+    cta: 'Explore Tailoring',
     bgClass: 'hero-slide-bg--5',
-    imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
-    productId: '103',
-    price: 68.50,
-    category: 'Home & Kitchen',
-    rating: 4.7,
-    reviewsCount: 68,
+    imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
+    productId: '5',
+    price: 7999,
+    category: 'Suits & Formal',
+    rating: 4.9,
+    reviewsCount: 78,
   },
 ];
 
@@ -160,22 +161,21 @@ export const HeroBanner = () => {
         if (promotions && promotions.length > 0) {
           const mapped: Slide[] = promotions.map((p, idx) => ({
             id: idx + 1,
-            tag: p.tagLine || 'Special Feature',
+            tag: p.tagLine || 'Wink Collection 2026',
             title: p.title,
             description: p.description,
             cta: 'Shop Now',
             bgClass: `hero-slide-bg--${(idx % 5) + 1}`,
             imageUrl: p.imageUrl,
             productId: p.productId,
-            price: p.price,
+            price: p.price || 2499,
           }));
           setSlides(mapped);
           setSlide([0, 0]);
         } else {
           setSlides(defaultSlides);
         }
-      } catch (err) {
-        console.error('Failed to load active promotions, using default luxury showcase slides:', err);
+      } catch {
         setSlides(defaultSlides);
       }
     };
@@ -314,7 +314,7 @@ export const HeroBanner = () => {
                     <div className="hero-product-price-box">
                       <span className="hero-product-price-label">Price</span>
                       <span className="hero-product-price">
-                        ${currentSlide.price.toFixed(2)}
+                        {formatPrice(currentSlide.price)}
                       </span>
                     </div>
                   )}

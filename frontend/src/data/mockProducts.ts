@@ -8,106 +8,165 @@ export interface Product {
   stock?: number;
   rating?: number;
   reviewsCount?: number;
+  color?: string;
+  sizes?: string[];
 }
 
 export const MOCK_PRODUCTS: Product[] = [
   {
-    id: 101,
-    name: 'Aura Studio Wireless Noise-Cancelling Headphones',
-    description: 'Custom acoustic architecture with 40mm dynamic drivers, spatial audio with dynamic head tracking, and up to 40 hours of battery life with ultra-soft memory foam earcups.',
-    price: 349.99,
-    category: 'Electronics',
+    id: 1,
+    name: 'Japan Green Outer Jacket',
+    description: 'Minimalist military-inspired utility jacket tailored with durable water-repellent Japanese cotton twill and matte horn buttons.',
+    price: 3499,
+    category: 'Outerwear',
+    imageUrl: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=800&q=80',
+    stock: 28,
+    rating: 4.9,
+    reviewsCount: 148,
+    color: '#2e4a3d',
+    sizes: ['S', 'M', 'L', 'XL']
+  },
+  {
+    id: 2,
+    name: 'Black To Basic Heavyweight Tee',
+    description: 'Relaxed drop-shoulder heavyweight 280 GSM combed organic cotton tee with reinforced ribbed collar that never sags.',
+    price: 1299,
+    category: 'T-Shirts',
+    imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+    stock: 65,
+    rating: 4.8,
+    reviewsCount: 230,
+    color: '#1a1a1a',
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+  },
+  {
+    id: 3,
+    name: 'Soft Minimalist Sage Hoodie',
+    description: 'Cloud-soft 450 GSM brushed French terry cotton hoodie featuring double-layer hood, hidden phone pouch, and seamless cuffs.',
+    price: 2799,
+    category: 'Hoodies',
+    imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
+    stock: 42,
+    rating: 4.9,
+    reviewsCount: 185,
+    color: '#8fae9b',
+    sizes: ['S', 'M', 'L', 'XL']
+  },
+  {
+    id: 4,
+    name: 'White Off Canvas Workwear Jacket',
+    description: 'Architectural cropped zip jacket crafted with off-white structured canvas, antique silver hardware, and interior utility pockets.',
+    price: 4299,
+    category: 'Outerwear',
+    imageUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80',
+    stock: 19,
+    rating: 4.8,
+    reviewsCount: 92,
+    color: '#f4f3ee',
+    sizes: ['M', 'L', 'XL']
+  },
+  {
+    id: 5,
+    name: 'One Set Tailored Modern Suit',
+    description: 'Two-piece deconstructed blazer and relaxed pleat trousers crafted with breathable wool-blend fabric for effortless contemporary elegance.',
+    price: 7999,
+    category: 'Suits & Formal',
+    imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
+    stock: 14,
+    rating: 4.9,
+    reviewsCount: 78,
+    color: '#374151',
+    sizes: ['38R', '40R', '42R', '44R']
+  },
+  {
+    id: 6,
+    name: 'Dinamy Mocha Earth Overshirt',
+    description: 'Relaxed button-up shirt in rich mocha brown, spun with slub-textured linen and cotton blend. Perfect for lightweight layering.',
+    price: 2199,
+    category: 'T-Shirts',
+    imageUrl: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=800&q=80',
+    stock: 35,
+    rating: 4.7,
+    reviewsCount: 114,
+    color: '#6b4423',
+    sizes: ['S', 'M', 'L', 'XL']
+  },
+  {
+    id: 7,
+    name: 'Blush Pastel Corduroy Overshirt',
+    description: 'Soft 12-wale needlecord overshirt in dusty rose, garment-washed for a lived-in drape and featuring dual chest flap pockets.',
+    price: 2899,
+    category: 'Outerwear',
+    imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80',
+    stock: 22,
+    rating: 4.7,
+    reviewsCount: 64,
+    color: '#d8b4b4',
+    sizes: ['XS', 'S', 'M', 'L']
+  },
+  {
+    id: 8,
+    name: 'White Off Minimalist Crewneck Tee',
+    description: 'Ultra-refined staple t-shirt made with 100% Supima long-staple cotton for unmatched drape, softness, and breathability.',
+    price: 1199,
+    category: 'T-Shirts',
+    imageUrl: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=800&q=80',
+    stock: 80,
+    rating: 4.9,
+    reviewsCount: 310,
+    color: '#ffffff',
+    sizes: ['S', 'M', 'L', 'XL', 'XXL']
+  },
+  {
+    id: 9,
+    name: 'Aura Studio Wireless Headphones',
+    description: 'Custom acoustic architecture with 40mm dynamic drivers, spatial audio tracking, and 40-hour battery life with memory foam earcups.',
+    price: 18999,
+    category: 'Tech & Lifestyle',
     imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
     stock: 24,
     rating: 4.9,
-    reviewsCount: 142
+    reviewsCount: 142,
+    color: '#111827',
+    sizes: ['One Size']
   },
   {
-    id: 102,
+    id: 10,
     name: 'Chronos Minimalist Chronograph Watch',
-    description: 'Precision Swiss quartz movement with sapphire crystal glass, 316L brushed stainless steel case, and interchangeable Italian top-grain leather straps. Water-resistant up to 50m.',
-    price: 219.00,
+    description: 'Precision Swiss quartz movement with sapphire crystal glass, 316L brushed stainless steel case, and interchangeable Italian leather straps.',
+    price: 12499,
     category: 'Accessories',
     imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
     stock: 18,
     rating: 4.8,
-    reviewsCount: 96
+    reviewsCount: 96,
+    color: '#475569',
+    sizes: ['40mm']
   },
   {
-    id: 103,
-    name: 'Nordic Ceramic Drip Coffee Carafe & Brewer',
-    description: 'Handcrafted stoneware matte-finish pour-over brewer with double-wall insulated carafe and reusable ultra-fine stainless steel mesh filter for rich artisanal brews.',
-    price: 68.50,
-    category: 'Home & Kitchen',
-    imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
-    stock: 35,
-    rating: 4.7,
-    reviewsCount: 68
-  },
-  {
-    id: 104,
-    name: 'Terra Ergonomic Mechanical Keyboard (Gateron Brown)',
-    description: 'Compact 75% ANSI layout crafted with solid anodized aluminum chassis, hot-swappable tactile Gateron Brown switches, per-key RGB backlighting, and PBT dye-sub keycaps.',
-    price: 159.00,
-    category: 'Electronics',
+    id: 11,
+    name: 'Terra 75% Mechanical Keyboard',
+    description: 'Solid CNC anodized aluminum chassis, hot-swappable tactile Gateron Brown switches, per-key RGB backlighting, and PBT keycaps.',
+    price: 5999,
+    category: 'Tech & Lifestyle',
     imageUrl: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80',
-    stock: 12,
-    rating: 4.9,
-    reviewsCount: 210
-  },
-  {
-    id: 105,
-    name: 'Vanguard Water-Resistant Commuter Backpack 24L',
-    description: 'Aerodynamic weatherproof ballistic nylon exterior with padded 16-inch laptop compartment, magnetic Fidlock buckles, hidden RFID security pockets, and breathable back airflow panel.',
-    price: 135.00,
-    category: 'Accessories',
-    imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
-    stock: 40,
-    rating: 4.8,
-    reviewsCount: 88
-  },
-  {
-    id: 106,
-    name: 'Lumina Smart Ambient Desk Lamp & Qi Charger',
-    description: 'Architectural aluminum LED luminaire featuring CRI 95+ eye-care diffused lighting, touch slider color temperature adjustment (2700K - 6500K), and integrated 15W wireless fast-charging base.',
-    price: 89.99,
-    category: 'Home & Kitchen',
-    imageUrl: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80',
-    stock: 28,
-    rating: 4.6,
-    reviewsCount: 54
-  },
-  {
-    id: 107,
-    name: 'Apex Precision Wireless Optical Mouse (Ergo-Grip)',
-    description: 'PixArt PAW3395 26,000 DPI sensor with sub-1ms wireless latency, Bluetooth 5.2 tri-mode connectivity, silent tactile Kailh switches, and ergonomic thumb rest for all-day productivity.',
-    price: 79.50,
-    category: 'Electronics',
-    imageUrl: 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800&q=80',
-    stock: 50,
-    rating: 4.7,
-    reviewsCount: 119
-  },
-  {
-    id: 108,
-    name: 'Solstice Polarized Acetate Sunglasses',
-    description: 'Hand-polished Italian Mazzucchelli acetate frames fitted with scratch-resistant category 3 polarized lenses providing 100% UV400 defense against harsh solar glare.',
-    price: 120.00,
-    category: 'Accessories',
-    imageUrl: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80',
-    stock: 22,
-    rating: 4.8,
-    reviewsCount: 75
-  },
-  {
-    id: 109,
-    name: 'Zenith Organic Bamboo Weighted Blanket (15 lbs)',
-    description: 'Eco-certified 100% silky cooling bamboo viscose fabric filled with micro-glass beads inside 7-layer diamond quilted pockets, providing gentle therapeutic deep pressure stimulation.',
-    price: 110.00,
-    category: 'Home & Kitchen',
-    imageUrl: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80',
     stock: 15,
     rating: 4.9,
-    reviewsCount: 160
+    reviewsCount: 210,
+    color: '#0f172a',
+    sizes: ['ANSI 75%']
+  },
+  {
+    id: 12,
+    name: 'Vanguard Weatherproof Commuter 24L',
+    description: 'Aerodynamic weatherproof ballistic nylon pack with padded 16-inch laptop compartment and magnetic Fidlock hardware.',
+    price: 3999,
+    category: 'Accessories',
+    imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
+    stock: 30,
+    rating: 4.8,
+    reviewsCount: 88,
+    color: '#1e293b',
+    sizes: ['24 Litres']
   }
 ];

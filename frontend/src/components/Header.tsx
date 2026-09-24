@@ -57,7 +57,8 @@ export const Header = () => {
     <header className="glass-header">
       <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {/* Brand Logo */}
-        <Link to="/" style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.25rem', letterSpacing: '0.1em' }}>
+        <Link to="/" style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.25rem', letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: '0.6rem', color: 'var(--color-active)', textDecoration: 'none' }}>
+          <img src="/logo.png" alt="ShopFlow" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
           SHOPFLOW
         </Link>
 

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, ArrowRight, Package, Trash2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { formatPrice } from '../utils/format';
 import './CartDrawer.css';
 
 export const CartDrawer = () => {
@@ -11,13 +12,6 @@ export const CartDrawer = () => {
   const handleCheckout = () => {
     toggleCart();
     navigate('/checkout');
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price);
   };
 
   return (

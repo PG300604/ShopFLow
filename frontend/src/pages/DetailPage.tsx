@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { MOCK_PRODUCTS } from '../data/mockProducts';
+import { formatPrice } from '../utils/format';
 import './DetailPage.css';
 
 interface Product {
@@ -291,7 +292,7 @@ export const DetailPage: React.FC = () => {
             </div>
           )}
 
-          <span className="detail-price">${product.price.toFixed(2)}</span>
+          <span className="detail-price">{formatPrice(product.price)}</span>
           <p className="detail-description">{product.description}</p>
 
           <div className="detail-actions">
