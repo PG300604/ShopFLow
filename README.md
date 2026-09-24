@@ -4,7 +4,7 @@
 
 ### Production-grade multi-vendor e-commerce platform engineered from the ground up as a solo full-stack initiative — featuring Java 17, Spring Boot 3.3.1 microservices, two-phase inventory reservation, Stripe payments, and a Pinterest-inspired React frontend
 
-[![Author](https://img.shields.io/badge/Author-Priyanshu_Garg-blue?logo=github)](https://github.com/PG300604)
+[![Author](https://img.shields.io/badge/Author-Priyanshu_Ghosh-blue?logo=github)](https://github.com/PG300604)
 [![Project Type](https://img.shields.io/badge/Project-Solo_Engineering-8A2BE2)](#-author--solo-engineering-note)
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3.1-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -56,7 +56,7 @@
 
 ## 🌟 Overview
 
-**ShopFlow** is an enterprise-grade, distributed multi-vendor e-commerce platform designed, architected, and engineered entirely by **Priyanshu Garg** as an end-to-end solo initiative. 
+**ShopFlow** is an enterprise-grade, distributed multi-vendor e-commerce platform designed, architected, and engineered entirely by **Priyanshu Ghosh** as an end-to-end solo initiative. 
 
 It addresses common distributed commerce challenges: **overselling under concurrent checkouts**, **distributed transaction rollback**, **asynchronous payment confirmation**, **multi-vendor data isolation**, **native INR (₹) currency localization**, and a **clean Pinterest-inspired minimalist editorial UI** without heavy third-party framework lock-in.
 
@@ -658,9 +658,9 @@ A comprehensive Postman test suite ([`ShopFlow_E2E_Tests.postman_collection.json
 
 ## 👤 Author & Solo Engineering Note
 
-**ShopFlow** was conceived, architected, and engineered entirely by **Priyanshu Garg** as a solo full-stack project.
+**ShopFlow** was conceived, architected, and engineered entirely by **Priyanshu Ghosh** as a solo full-stack project.
 
-- **Author**: Priyanshu Garg ([GitHub Profile](https://github.com/PG300604))
+- **Author**: Priyanshu Ghosh ([GitHub Profile](https://github.com/PG300604))
 - **Engineering Scope**:
   - **System Architecture**: Designed the distributed domain boundaries across 6 microservices, Eureka service discovery, and Spring Cloud API Gateway.
   - **Data Consistency**: Implemented two-phase inventory reservation locks (`PENDING` $\rightarrow$ `COMMITTED` / `RELEASED`) and automatic timeout sweepers to prevent overselling.
