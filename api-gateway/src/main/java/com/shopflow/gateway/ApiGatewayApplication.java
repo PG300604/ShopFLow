@@ -23,11 +23,15 @@ public class ApiGatewayApplication {
     private static final Logger log = LoggerFactory.getLogger(ApiGatewayApplication.class);
 
     @Bean
-    public static org.springframework.beans.factory.config.BeanFactoryPostProcessor removeWeightCalculatorFilter() {
+    public static org.springframework.beans.factory.config.BeanFactoryPostProcessor removeWeightBeans() {
         return beanFactory -> {
-            if (beanFactory.containsBeanDefinition("weightCalculatorWebFilter")) {
-                ((org.springframework.beans.factory.support.BeanDefinitionRegistry) beanFactory)
-                        .removeBeanDefinition("weightCalculatorWebFilter");
+            if (beanFactory instanceof org.springframework.beans.factory.support.BeanDefinitionRegistry registry) {
+                if (registry.containsBeanDefinition("weightCalculatorWebFilter")) {
+                    registry.removeBeanDefinition("weightCalculatorWebFilter");
+                }
+                if (registry.containsBeanDefinition("weightRoutePredicateFactory")) {
+                    registry.removeBeanDefinition("weightRoutePredicateFactory");
+                }
             }
         };
     }

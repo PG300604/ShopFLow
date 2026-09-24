@@ -1,9 +1,17 @@
 package com.shopflow.gateway;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SpringBootTest
 public class ApiGatewayApplicationTest {
+
+    @Test
+    void contextLoads() {
+        // Verifies Spring context initializes all gateway beans, routes, and filters without exceptions
+    }
 
     @Test
     void testNormalizeUri_BareHostname() {
